@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button menu="main-menu" color="light"></ion-menu-button>
+    </ion-buttons>
+    <ion-title> ChocoExpress </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Blank</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <strong>Welcome to ChocoExpress!</strong>
+    <p>Your premium chocolate shopping destination</p>
+
+    <ion-button expand="block" color="primary" style="margin-top: 20px">
+      <ion-icon name="storefront-outline" slot="start"></ion-icon>
+      Browse Catalog
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      color="secondary"
+      style="margin-top: 10px"
+    >
+      <ion-icon name="heart-outline" slot="start"></ion-icon>
+      View Favorites
+    </ion-button>
+  </div>
+</ion-content>

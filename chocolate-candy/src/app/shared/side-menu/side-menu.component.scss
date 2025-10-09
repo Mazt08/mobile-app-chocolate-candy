@@ -1,0 +1,360 @@
+:host {
+  --menu-width: min(340px, 85vw);
+  --chocolate-primary: #3e1f0f;
+  --chocolate-secondary: #5a2e1a;
+  --chocolate-accent: #d4941e;
+  --cream-light: #f8f4f0;
+  --cream-medium: #e8ddd4;
+  --text-light: rgba(255, 255, 255, 0.95);
+  --text-medium: rgba(255, 255, 255, 0.8);
+  --text-muted: rgba(255, 255, 255, 0.6);
+}
+
+/* Menu Container */
+.chocolate-menu {
+  --width: var(--menu-width);
+}
+
+/* Menu Content Background */
+.menu-content {
+  --background: linear-gradient(
+    180deg,
+    var(--chocolate-primary) 0%,
+    var(--chocolate-secondary) 100%
+  );
+  --color: var(--text-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      rgba(212, 148, 30, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(212, 148, 30, 0.08) 0%,
+      transparent 50%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Profile Header */
+.menu-header {
+  position: relative;
+  padding: 24px 20px 20px;
+  cursor: pointer;
+  z-index: 1;
+  transition: background-color 0.2s ease;
+}
+
+.menu-header:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.profile-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(212, 148, 30, 0.15) 0%,
+    transparent 70%
+  );
+  border-radius: 0 0 20px 0;
+}
+
+.profile-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-avatar {
+  width: 64px;
+  height: 64px;
+  border: 3px solid rgba(212, 148, 30, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.user-subtitle {
+  font-size: 13px;
+  color: var(--chocolate-accent);
+  font-weight: 500;
+}
+
+.profile-arrow {
+  font-size: 20px;
+  color: var(--text-medium);
+  transition: transform 0.2s ease;
+}
+
+.menu-header:hover .profile-arrow {
+  transform: translateX(4px);
+}
+
+/* Menu Body */
+.menu-body {
+  flex: 1;
+  padding: 8px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.menu-list {
+  background: transparent;
+  padding: 0;
+}
+
+/* Menu Items */
+.menu-item {
+  --background: transparent;
+  --color: var(--text-light);
+  --padding-start: 20px;
+  --padding-end: 20px;
+  --min-height: 52px;
+  margin: 2px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: slideInStagger 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(212, 148, 30, 0.1) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.menu-item:hover::before {
+  opacity: 1;
+}
+
+.menu-item:hover {
+  --background: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+}
+
+.menu-item.active {
+  --background: rgba(212, 148, 30, 0.2);
+  border-left: 4px solid var(--chocolate-accent);
+  --padding-start: 16px;
+  box-shadow: 0 2px 12px rgba(212, 148, 30, 0.3);
+}
+
+.menu-item.active .menu-icon {
+  color: var(--chocolate-accent);
+  transform: scale(1.1);
+}
+
+.menu-icon {
+  font-size: 22px;
+  color: var(--text-medium);
+  transition: all 0.2s ease;
+  margin-right: 4px;
+}
+
+.menu-item:hover .menu-icon {
+  color: var(--chocolate-accent);
+  transform: scale(1.05);
+}
+
+.menu-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-light);
+  transition: color 0.2s ease;
+}
+
+.menu-item:hover .menu-label {
+  color: white;
+}
+
+.menu-badge {
+  --background: var(--chocolate-accent);
+  --color: var(--chocolate-primary);
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.menu-badge[color="danger"] {
+  --background: #e74c3c;
+  --color: white;
+  animation: pulse 2s infinite;
+}
+
+/* Menu Divider */
+.menu-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  margin: 16px 32px;
+  position: relative;
+}
+
+.menu-divider::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: var(--chocolate-accent);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* Footer */
+.menu-footer {
+  padding: 16px 20px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.logout-button {
+  --color: var(--text-medium);
+  margin-bottom: 12px;
+  height: 40px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  --color: var(--chocolate-accent);
+  --background: rgba(255, 255, 255, 0.05);
+}
+
+.app-version {
+  text-align: center;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* Animations */
+@keyframes slideInStagger {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .menu-item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .menu-badge[color="danger"] {
+    animation: none;
+  }
+
+  * {
+    transition: none !important;
+  }
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+  :host {
+    --chocolate-primary: #2a1508;
+    --chocolate-secondary: #3e1f0f;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  :host {
+    --menu-width: 90vw;
+  }
+
+  .menu-header {
+    padding: 20px 16px 16px;
+  }
+
+  .user-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .user-name {
+    font-size: 16px;
+  }
+
+  .menu-item {
+    --min-height: 48px;
+    margin: 1px 8px;
+  }
+}

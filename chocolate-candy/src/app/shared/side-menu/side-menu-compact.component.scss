@@ -1,0 +1,196 @@
+:host {
+  --menu-width: min(320px, 84vw);
+  --chocolate-primary: #3e1f0f;
+  --chocolate-secondary: #5a2e1a;
+  --chocolate-accent: #d4941e;
+}
+.chocolate-menu {
+  --width: var(--menu-width);
+}
+.menu-content {
+  --background: linear-gradient(180deg, #3e1f0f, #5a2e1a);
+  --color: #fff;
+}
+.menu-header {
+  padding: 16px 14px 10px;
+  cursor: pointer;
+}
+.profile-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-avatar {
+  width: 46px;
+  height: 46px;
+  border: 2px solid rgba(212, 148, 30, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.user-info {
+  flex: 1;
+}
+.user-name {
+  font: 600 14px system-ui;
+  color: #fff;
+  margin: 0;
+}
+.user-subtitle {
+  font: 500 10px system-ui;
+  color: var(--chocolate-accent);
+}
+.menu-body {
+  padding: 4px 0;
+}
+.menu-list { text-align: left; }
+.section-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.section-header {
+  font: 600 9px system-ui;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  padding: 8px 12px 2px;
+  color: rgba(255, 255, 255, 0.4);
+}
+.menu-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  padding: 10px 12px; /* min touch target height */
+  padding-left: 16px; /* room for left accent bar */
+  margin: 2px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: 0 0;
+  color: #f7f7f7;
+  font: 500 12.5px system-ui;
+  cursor: pointer;
+  justify-content: flex-start;
+  text-align: left;
+  position: relative;
+}
+.menu-row:focus-visible {
+  outline: 2px solid rgba(212, 148, 30, 0.9);
+  outline-offset: 2px;
+}
+.menu-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.menu-row.active { background: transparent; }
+.menu-row .active-pill {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--chocolate-accent);
+  border-radius: 2px;
+}
+.menu-row:not(.active) .active-pill { display: none; }
+.collapsed .active-pill { display: none !important; }
+.icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent; /* remove square background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.menu-row.active .icon-wrap {
+  background: transparent; /* keep clean, no square */
+  color: var(--chocolate-accent);
+}
+.icon-wrap ion-icon {
+  font-size: 17px;
+  color: currentColor;
+}
+.label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+.collapse-toggle {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+}
+.collapse-toggle:hover { background: rgba(255, 255, 255, 0.1); opacity: 1; }
+.brand-initial {
+  font: 700 15px system-ui;
+  color: var(--chocolate-accent);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+.menu-badge {
+  --background: var(--chocolate-accent);
+  --color: #3e1f0f;
+  font-size: 9px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  line-height: 16px;
+}
+.menu-badge[color="danger"] {
+  --background: #e74c3c;
+  --color: #fff;
+}
+.collapsed .section-header,
+.collapsed .label,
+.collapsed .user-info,
+.collapsed .logout-button,
+.collapsed .app-version {
+  display: none !important;
+}
+.collapsed ion-menu,
+.collapsed .chocolate-menu {
+  --width: 74px;
+}
+.collapsed .menu-row {
+  grid-template-columns: 1fr;
+  justify-content: center;
+  margin: 4px 4px;
+  padding: 10px 8px;
+}
+.collapsed .user-avatar {
+  width: 40px;
+  height: 40px;
+}
+.menu-footer {
+  padding: 10px 12px 16px;
+}
+.app-version {
+  text-align: center;
+  font: 400 9px system-ui;
+  opacity: 0.5;
+}
+.dot-badge {
+  display: none;
+}
+@media (max-width: 480px) {
+  :host {
+    --menu-width: 90vw;
+  }
+}

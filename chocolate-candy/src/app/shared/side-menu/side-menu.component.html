@@ -1,0 +1,95 @@
+<ion-menu
+  side="start"
+  menuId="main-menu"
+  contentId="main-content"
+  class="chocolate-menu"
+  [class.collapsed]="collapsed"
+>
+  <ion-content class="menu-content" scrollY="true">
+    <!-- Profile / Brand Header -->
+    <div class="menu-header" (click)="goToProfile()">
+      <div class="profile-content">
+        <ion-avatar class="user-avatar" *ngIf="!collapsed">
+          <img
+            [src]="user?.avatar || defaultAvatar"
+            [alt]="user?.name + ' avatar'"
+            onerror="this.src='assets/icon/user-avatar.svg'"
+          />
+        </ion-avatar>
+        <div class="user-info" *ngIf="!collapsed">
+          <div class="user-name">{{ user?.name || "Guest User" }}</div>
+          <div class="user-subtitle">{{ getProfileSubtitle() }}</div>
+        </div>
+        <div class="brand-initial" *ngIf="collapsed">CE</div>
+        <button
+          class="collapse-toggle"
+          type="button"
+          (click)="toggleCollapsed($event)"
+          aria-label="Toggle collapse"
+        >
+          <ion-icon
+            [name]="
+              collapsed ? 'chevron-forward-outline' : 'chevron-back-outline'
+            "
+          ></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Grouped Navigation -->
+    <nav class="menu-body" aria-label="Primary">
+      <ion-list lines="none" class="menu-list">
+        <ng-container *ngFor="let section of sections; let s = index">
+          <div class="section-block">
+            <div class="section-header" *ngIf="!collapsed">
+              {{ section.label }}
+            </div>
+            <ul class="section-items" role="list">
+              <li *ngFor="let item of section.items; let i = index">
+                <button
+                  class="menu-row"
+                  [class.active]="isActive(item)"
+                  (click)="navigate(item)"
+                  [attr.aria-current]="isActive(item) ? 'page' : null"
+                  [attr.aria-label]="item.title"
+                  [attr.title]="collapsed ? item.title : null"
+                >
+                  <span
+                    class="icon-wrap"
+                    [class.has-badge]="shouldShowBadge(item)"
+                  >
+                    <ion-icon [name]="item.icon"></ion-icon>
+                    <span
+                      *ngIf="shouldShowBadge(item)"
+                      class="dot-badge"
+                      [class.alert]="item.route === '/' && item.badge === 'New'"
+                    ></span>
+                  </span>
+                  <span class="label" *ngIf="!collapsed">{{ item.title }}</span>
+                  <ion-badge
+                    *ngIf="!collapsed && shouldShowBadge(item)"
+                    [color]="
+                      item.route === '/cart' && item.badge && +item.badge > 0
+                        ? 'danger'
+                        : 'warning'
+                    "
+                    class="menu-badge"
+                    >{{ displayBadge(item.badge!) }}</ion-badge
+                  >
+                  <span class="active-pill" aria-hidden="true"></span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </ng-container>
+      </ion-list>
+    </nav>
+
+    <!-- Footer -->
+    <div class="menu-footer">
+      <div class="app-version" *ngIf="!collapsed">
+        <ion-text color="medium">ChocoExpress v1.0.0</ion-text>
+      </div>
+    </div>
+  </ion-content>
+</ion-menu>

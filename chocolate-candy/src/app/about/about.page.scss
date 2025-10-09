@@ -1,0 +1,44 @@
+.hero {
+  padding: 24px 16px 8px;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--ion-color-primary-rgb), 0.12),
+    transparent
+  );
+  text-align: center;
+}
+.hero .badge {
+  display: inline-block;
+  background: var(--ion-color-primary);
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.hero h1 {
+  margin: 10px 0 6px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+.hero p {
+  margin: 0 auto;
+  max-width: 680px;
+  color: var(--ion-color-step-600);
+  font-size: 14px;
+}
+ion-card {
+  margin: 12px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+ion-item ion-icon {
+  color: var(--ion-color-primary);
+}
+.footer-note {
+  padding: 16px;
+  text-align: center;
+  color: var(--ion-color-step-600);
+  font-size: 13px;
+}

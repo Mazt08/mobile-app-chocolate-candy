@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">chocolate-candy</string>
+    <string name="title_activity_main">chocolate-candy</string>
+    <string name="package_name">chocolate.candy</string>
+    <string name="custom_url_scheme">chocolate.candy</string>
+</resources>

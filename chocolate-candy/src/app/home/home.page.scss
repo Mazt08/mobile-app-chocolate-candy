@@ -1,0 +1,39 @@
+#container {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 20px;
+}
+
+#container strong {
+  font-size: 24px;
+  line-height: 30px;
+  color: var(--ion-color-primary);
+  display: block;
+  margin-bottom: 8px;
+}
+
+#container p {
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--ion-color-medium);
+  margin: 0 0 20px 0;
+  font-style: italic;
+}
+
+#container a {
+  text-decoration: none;
+}
+
+ion-content {
+  --background: linear-gradient(135deg, #f8f4f0 0%, #e8ddd4 100%);
+}
+
+ion-button {
+  margin: 8px 0;
+  --border-radius: 12px;
+  font-weight: 600;
+}
