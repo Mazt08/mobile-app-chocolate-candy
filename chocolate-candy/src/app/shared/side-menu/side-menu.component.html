@@ -76,6 +76,11 @@
                     class="menu-badge"
                     >{{ displayBadge(item.badge!) }}</ion-badge
                   >
+                  <ion-icon
+                    *ngIf="!collapsed"
+                    class="chevron"
+                    name="chevron-forward-outline"
+                  ></ion-icon>
                   <span class="active-pill" aria-hidden="true"></span>
                 </button>
               </li>
