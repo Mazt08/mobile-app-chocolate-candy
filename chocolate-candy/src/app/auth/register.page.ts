@@ -50,6 +50,16 @@ import { AuthService } from './auth.service';
         </ion-item>
         <ion-item>
           <ion-input
+            type="text"
+            label="Username"
+            labelPlacement="floating"
+            formControlName="username"
+            autocomplete="username"
+            required
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input
             type="email"
             label="Email"
             labelPlacement="floating"
@@ -142,9 +152,26 @@ import { AuthService } from './auth.service';
 })
 export class RegisterPage {
   form = this.fb.group({
+    username: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.pattern(/^[a-zA-Z0-9_\.\-]+$/),
+      ],
+    ],
     name: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
+        ),
+      ],
+    ],
     confirm: ['', [Validators.required]],
   });
 
@@ -156,12 +183,13 @@ export class RegisterPage {
 
   submit() {
     if (this.form.invalid) return;
-    const { name, email, password, confirm } = this.form.getRawValue();
+    const { username, name, email, password, confirm } =
+      this.form.getRawValue();
     if (password !== confirm) {
       alert('Passwords do not match');
       return;
     }
-    this.auth.register(name!, email!, password!);
+    this.auth.register(name!, username!, email!, password!);
     this.router.navigate(['/home']);
   }
 

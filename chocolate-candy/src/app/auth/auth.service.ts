@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface AuthUser {
   name: string;
+  username?: string;
   email: string;
   avatar?: string | null;
   points?: number;
@@ -43,9 +44,10 @@ export class AuthService {
     this._user$.next(user);
   }
 
-  register(name: string, email: string, _password: string) {
+  register(name: string, username: string, email: string, _password: string) {
     const user: AuthUser = {
       name,
+      username,
       email,
       avatar: null,
       points: 0,

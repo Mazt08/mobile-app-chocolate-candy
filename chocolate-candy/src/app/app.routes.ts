@@ -9,23 +9,19 @@ export const routes: Routes = [
   {
     path: 'catalog',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Catalog')
-      ),
+      import('./pages/catalog/catalog.page').then((m) => m.CatalogPage),
   },
   {
     path: 'categories',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Categories')
+      import('./pages/categories/categories.page').then(
+        (m) => m.CategoriesPage
       ),
   },
   {
     path: 'offers',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Special Offers')
-      ),
+      import('./pages/offers/offers.page').then((m) => m.OffersPage),
   },
   {
     path: 'favorites',
@@ -37,17 +33,13 @@ export const routes: Routes = [
   {
     path: 'cart',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Shopping Cart')
-      ),
+      import('./pages/cart/cart.page').then((m) => m.CartPage),
     canMatch: [authGuard],
   },
   {
     path: 'orders',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('My Orders')
-      ),
+      import('./pages/orders/orders.page').then((m) => m.OrdersPage),
     canMatch: [authGuard],
   },
   {
@@ -60,25 +52,19 @@ export const routes: Routes = [
   {
     path: 'profile',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Profile')
-      ),
+      import('./pages/profile/profile.page').then((m) => m.ProfilePage),
     canMatch: [authGuard],
   },
   {
     path: 'settings',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Settings')
-      ),
+      import('./pages/settings/settings.page').then((m) => m.SettingsPage),
     canMatch: [authGuard],
   },
   {
     path: 'help',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Help & FAQ')
-      ),
+      import('./pages/help/help.page').then((m) => m.HelpPage),
   },
   {
     path: 'about',
@@ -87,8 +73,8 @@ export const routes: Routes = [
   {
     path: 'developers',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Developers')
+      import('./pages/developers/developers.page').then(
+        (m) => m.DevelopersPage
       ),
   },
   {
