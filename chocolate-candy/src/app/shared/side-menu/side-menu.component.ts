@@ -19,6 +19,7 @@ import {
   MenuItem,
   FLAT_MENU,
 } from './menu-items';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-side-menu',
@@ -58,14 +59,24 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     return this.collapsed;
   }
 
-  constructor(private router: Router, private menuController: MenuController) {}
+  constructor(
+    private router: Router,
+    private menuController: MenuController,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {
     // Update cart badge in real-time
     this.updateCartBadge();
 
-    // Load user data if available
+    // Load user data if available and subscribe for changes
     this.loadUserData();
+    this.auth.user$.pipe(takeUntil(this.destroy$)).subscribe((u) => {
+      if (u) {
+        this.user = u;
+      }
+      this.sections = this.filterSectionsByVisibility(APP_MENU_SECTIONS);
+    });
 
     // Apply responsive collapse if wide screen (desktop preview scenario)
     this.applyAutoResponsive();
@@ -119,16 +130,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
 
   async logout() {
     // Implement logout logic here
-    try {
-      localStorage.removeItem('chocoexpressUser');
-    } catch {}
-    this.user = {
-      name: 'Guest User',
-      email: 'guest@chocoexpress.com',
-      avatar: null,
-      points: 0,
-      isLoggedIn: false,
-    };
+    this.auth.logout();
 
     await this.menuController.close('main-menu');
     // Refresh menu visibility for guest

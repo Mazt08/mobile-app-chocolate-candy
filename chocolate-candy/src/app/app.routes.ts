@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
   {
@@ -39,6 +40,7 @@ export const routes: Routes = [
       import('./placeholders/generic.page').then((m) =>
         m.makePlaceholder('Shopping Cart')
       ),
+    canMatch: [authGuard],
   },
   {
     path: 'orders',
@@ -46,6 +48,7 @@ export const routes: Routes = [
       import('./placeholders/generic.page').then((m) =>
         m.makePlaceholder('My Orders')
       ),
+    canMatch: [authGuard],
   },
   {
     path: 'notifications',
@@ -60,6 +63,7 @@ export const routes: Routes = [
       import('./placeholders/generic.page').then((m) =>
         m.makePlaceholder('Profile')
       ),
+    canMatch: [authGuard],
   },
   {
     path: 'settings',
@@ -67,6 +71,7 @@ export const routes: Routes = [
       import('./placeholders/generic.page').then((m) =>
         m.makePlaceholder('Settings')
       ),
+    canMatch: [authGuard],
   },
   {
     path: 'help',
@@ -88,21 +93,16 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Login')
-      ),
+    loadComponent: () => import('./auth/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'register',
     loadComponent: () =>
-      import('./placeholders/generic.page').then((m) =>
-        m.makePlaceholder('Register')
-      ),
+      import('./auth/register.page').then((m) => m.RegisterPage),
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
 ];
