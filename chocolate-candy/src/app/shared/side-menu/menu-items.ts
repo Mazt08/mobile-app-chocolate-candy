@@ -24,7 +24,6 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
     label: 'Shop',
     items: [
       { title: 'Catalog', route: '/catalog', icon: 'library-outline' },
-      { title: 'Categories', route: '/categories', icon: 'grid-outline' },
       {
         title: 'Special Offers',
         route: '/offers',

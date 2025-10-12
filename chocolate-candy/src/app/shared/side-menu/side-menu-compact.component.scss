@@ -8,8 +8,14 @@
   --width: var(--menu-width);
 }
 .menu-content {
-  --background: linear-gradient(180deg, #3e1f0f, #5a2e1a);
-  --color: #fff;
+  /* Use theme variables for consistency */
+  --background: var(--ion-background-color);
+  --color: var(--ion-text-color);
+  background: linear-gradient(
+    180deg,
+    rgba(90, 46, 26, 0.12),
+    rgba(90, 46, 26, 0.04)
+  );
 }
 .menu-header {
   padding: 16px 14px 10px;
@@ -37,7 +43,7 @@
 }
 .user-name {
   font: 600 14px system-ui;
-  color: #fff;
+  color: var(--ion-text-color);
   margin: 0;
 }
 .user-subtitle {
@@ -82,7 +88,7 @@
   border: 0;
   border-radius: 10px;
   background: 0 0;
-  color: #f7f7f7;
+  color: var(--ion-text-color);
   font: 500 12.5px system-ui;
   cursor: pointer;
   justify-content: flex-start;
@@ -94,13 +100,13 @@
   outline-offset: 2px;
 }
 .menu-row:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.06);
 }
 .menu-row.active {
   background: transparent;
 }
 .menu-row.active:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.06);
 }
 .menu-row .active-pill {
   position: absolute;

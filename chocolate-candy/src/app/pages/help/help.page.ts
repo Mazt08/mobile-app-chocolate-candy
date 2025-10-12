@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   IonHeader,
   IonToolbar,
@@ -11,6 +12,10 @@ import {
   IonAccordion,
   IonItem,
   IonLabel,
+  IonTextarea,
+  IonInput,
+  IonButton,
+  IonToast,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -44,11 +49,33 @@ import {
           </div>
         </ion-accordion>
       </ion-accordion-group>
+
+      <div class="ion-padding-top">
+        <h2>Contact us</h2>
+        <ion-item>
+          <ion-input placeholder="Your email" [(ngModel)]="email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-textarea
+            autoGrow="true"
+            placeholder="Message"
+            [(ngModel)]="message"
+          ></ion-textarea>
+        </ion-item>
+        <ion-button expand="block" (click)="send()">Send</ion-button>
+      </div>
+      <ion-toast
+        [isOpen]="toastOpen"
+        message="Thanks! We'll get back to you."
+        duration="2000"
+        (ionToastDidDismiss)="toastOpen = false"
+      ></ion-toast>
     </ion-content>
   `,
   styles: [``],
   imports: [
     CommonModule,
+    FormsModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -59,6 +86,21 @@ import {
     IonAccordion,
     IonItem,
     IonLabel,
+    IonTextarea,
+    IonInput,
+    IonButton,
+    IonToast,
   ],
 })
-export class HelpPage {}
+export class HelpPage {
+  email = '';
+  message = '';
+  toastOpen = false;
+
+  send() {
+    if (!this.email || !this.message) return;
+    this.toastOpen = true;
+    this.email = '';
+    this.message = '';
+  }
+}

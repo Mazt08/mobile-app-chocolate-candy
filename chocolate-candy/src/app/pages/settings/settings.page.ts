@@ -12,7 +12,10 @@ import {
   IonItem,
   IonToggle,
   IonLabel,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/angular/standalone';
+import { ThemeService, ThemePreference } from '../../shared/theme.service';
 
 @Component({
   standalone: true,
@@ -33,8 +36,23 @@ import {
           <ion-toggle slot="end" [(ngModel)]="notifications"></ion-toggle>
         </ion-item>
         <ion-item>
-          <ion-label>Dark mode</ion-label>
-          <ion-toggle slot="end" [(ngModel)]="dark"></ion-toggle>
+          <ion-label>Theme</ion-label>
+          <ion-select
+            interface="popover"
+            [(ngModel)]="themePref"
+            (ionChange)="applyTheme()"
+          >
+            <ion-select-option value="system">System</ion-select-option>
+            <ion-select-option value="light">Light</ion-select-option>
+            <ion-select-option value="dark">Dark</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Currency</ion-label>
+          <ion-select interface="popover" [(ngModel)]="currency">
+            <ion-select-option value="PHP">PHP ₱</ion-select-option>
+            <ion-select-option value="USD">USD $</ion-select-option>
+          </ion-select>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -53,9 +71,20 @@ import {
     IonItem,
     IonToggle,
     IonLabel,
+    IonSelect,
+    IonSelectOption,
   ],
 })
 export class SettingsPage {
   notifications = true;
-  dark = false;
+  themePref: ThemePreference = 'system';
+  currency: 'PHP' | 'USD' = 'PHP';
+
+  constructor(private theme: ThemeService) {
+    this.themePref = this.theme.getPreference();
+  }
+
+  applyTheme() {
+    this.theme.setPreference(this.themePref);
+  }
 }

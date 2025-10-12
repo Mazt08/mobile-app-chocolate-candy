@@ -37,3 +37,58 @@ ion-button {
   --border-radius: 12px;
   font-weight: 600;
 }
+
+.quick-cats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 14px 0 8px;
+}
+.chip {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--ion-text-color);
+  border: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.section-title {
+  text-align: left;
+  margin: 16px 6px 8px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ion-color-primary);
+}
+.product-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  margin: 6px 4px;
+}
+.product-img {
+  height: 140px;
+  object-fit: cover;
+  width: 100%;
+}
+.product-header {
+  padding-bottom: 0;
+}
+.product-title {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+}
+.product-content {
+  margin-top: auto;
+}
+.price {
+  color: var(--ion-color-medium);
+  font-weight: 600;
+}
+.add-btn {
+  margin-top: 8px;
+  --border-radius: 10px;
+}

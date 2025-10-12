@@ -34,4 +34,57 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Utility classes */
+.section-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 16px 6px 8px;
+}
+.chip {
+  background: color-mix(in oklab, var(--ion-text-color) 6%, transparent);
+  color: var(--ion-text-color);
+  border: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.product-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  margin: 6px 4px;
+}
+.product-img {
+  height: 140px;
+  object-fit: cover;
+  width: 100%;
+}
+.product-header {
+  padding-bottom: 0;
+}
+.product-title {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+}
+.product-content {
+  margin-top: auto;
+}
+.price {
+  color: var(--ion-color-medium);
+  font-weight: 600;
+}
+.add-btn {
+  margin-top: 8px;
+  --border-radius: 10px;
+}
+
+/* Ensure main app background uses theme var consistently */
+ion-app,
+ion-content {
+  --background: var(--ion-background-color);
+}

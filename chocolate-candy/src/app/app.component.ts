@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { SideMenuComponent } from './shared/side-menu/side-menu.component';
+import { ThemeService } from './shared/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,7 @@ import { SideMenuComponent } from './shared/side-menu/side-menu.component';
   imports: [IonApp, IonRouterOutlet, SideMenuComponent],
 })
 export class AppComponent {
-  constructor() {}
+  constructor(private theme: ThemeService) {
+    this.theme.init();
+  }
 }

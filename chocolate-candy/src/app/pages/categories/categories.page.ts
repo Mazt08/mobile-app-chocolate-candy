@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -26,7 +27,7 @@ import {
     </ion-header>
     <ion-content class="ion-padding">
       <div class="chips">
-        <ion-chip *ngFor="let c of categories" outline>
+        <ion-chip *ngFor="let c of categories" outline (click)="goTo(c.label)">
           <ion-icon [name]="c.icon"></ion-icon>
           <ion-label>{{ c.label }}</ion-label>
         </ion-chip>
@@ -67,4 +68,8 @@ export class CategoriesPage {
     { label: 'Caramel', icon: 'flame-outline' },
     { label: 'Fruit', icon: 'apple-outline' },
   ];
+  constructor(private router: Router) {}
+  goTo(label: string) {
+    this.router.navigate(['/catalog'], { queryParams: { category: label } });
+  }
 }

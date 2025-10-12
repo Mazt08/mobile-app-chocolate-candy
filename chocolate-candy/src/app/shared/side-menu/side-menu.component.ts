@@ -20,6 +20,7 @@ import {
   FLAT_MENU,
 } from './menu-items';
 import { AuthService } from '../../auth/auth.service';
+import { CartService } from '../../cart/cart.service';
 
 @Component({
   selector: 'app-side-menu',
@@ -62,7 +63,8 @@ export class SideMenuComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private menuController: MenuController,
-    private auth: AuthService
+    private auth: AuthService,
+    private cart: CartService
   ) {}
 
   ngOnInit() {
@@ -81,6 +83,12 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     // Apply responsive collapse if wide screen (desktop preview scenario)
     this.applyAutoResponsive();
     window.addEventListener('resize', this.applyAutoResponsiveBound);
+
+    // Cart badge updates
+    this.cart.count$.pipe(takeUntil(this.destroy$)).subscribe((count) => {
+      this.cartCount = count;
+      this.updateCartBadge();
+    });
   }
 
   ngOnDestroy() {
