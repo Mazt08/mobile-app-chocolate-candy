@@ -11,6 +11,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 480,
         weight: '100g',
         category: 'Signature Chocolate Bars',
+        img: 'assets/images/midnight-espresso.jpg',
       },
       {
         id: 1002,
@@ -19,6 +20,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 420,
         weight: '100g',
         category: 'Signature Chocolate Bars',
+        img: 'assets/images/creamy-milk.jpg',
       },
       {
         id: 1003,
@@ -27,6 +29,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 460,
         weight: '100g',
         category: 'Signature Chocolate Bars',
+        img: 'assets/images/orange-zest.jpg',
       },
       {
         id: 1004,
@@ -35,6 +38,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 440,
         weight: '100g',
         category: 'Signature Chocolate Bars',
+        img: 'assets/images/ivory-white.jpg',
       },
     ],
   },
@@ -48,6 +52,8 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 540,
         weight: '85g',
         category: 'Caramel Chocolate Creations',
+        img: 'assets/images/salt-caramel.jpg',
+
       },
       {
         id: 2002,
@@ -56,6 +62,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 510,
         weight: '90g',
         category: 'Caramel Chocolate Creations',
+        img: 'assets/images/caramel-crunch.jpg',
       },
       {
         id: 2003,
@@ -64,6 +71,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 570,
         weight: '95g',
         category: 'Caramel Chocolate Creations',
+        img: 'assets/images/double-caramel.jpg',
       },
       {
         id: 2004,
@@ -72,6 +80,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 680,
         weight: '150g',
         category: 'Caramel Chocolate Creations',
+        img: 'assets/images/himalayan-salt.jpg',
       },
     ],
   },
@@ -85,6 +94,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 850,
         weight: '300g',
         category: 'Decadent Truffles',
+        img: 'assets/images/caramel-truffle.jpg',
       },
       {
         id: 3002,
@@ -93,6 +103,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 780,
         weight: '250g',
         category: 'Decadent Truffles',
+        img: 'assets/images/caramel-macchiato.jpg',
       },
       {
         id: 3003,
@@ -101,6 +112,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 720,
         weight: '200g',
         category: 'Decadent Truffles',
+        img: 'assets/images/dark-ganache.jpg',
       },
       {
         id: 3004,
@@ -109,6 +121,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 750,
         weight: '220g',
         category: 'Decadent Truffles',
+        img: 'assets/images/raspberry-rose.jpg',
       },
     ],
   },
@@ -122,6 +135,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 520,
         weight: '200g',
         category: 'Chocolate Covered Treats',
+        img: 'assets/images/chocolate-covered-almonds.jpg',
       },
       {
         id: 4002,
@@ -130,6 +144,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 580,
         weight: '180g',
         category: 'Chocolate Covered Treats',
+        img: 'assets/images/salted-caramel-pecan.jpg',
       },
       {
         id: 4003,
@@ -138,6 +153,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 490,
         weight: '150g',
         category: 'Chocolate Covered Treats',
+        img: 'assets/images/milk-chocolate-honeycomb.jpg',
       },
       {
         id: 4004,
@@ -146,6 +162,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 450,
         weight: '120g',
         category: 'Chocolate Covered Treats',
+        img: 'assets/images/chocolate-covered-coffee-beans.jpg',
       },
     ],
   },
@@ -159,6 +176,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 2100,
         weight: '425g',
         category: 'Gourmet Gift Boxes',
+        img: 'assets/images/world-tour-collection.jpg',
       },
       {
         id: 5002,
@@ -167,6 +185,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 1850,
         weight: '500g',
         category: 'Gourmet Gift Boxes',
+        img: 'assets/images/ultimate-caramel-lovers-box.jpg',
       },
       {
         id: 5003,
@@ -175,6 +194,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 1600,
         weight: '400g',
         category: 'Gourmet Gift Boxes',
+        img: 'assets/images/truffle-tasters-premium-box.jpg',
       },
       {
         id: 5004,
@@ -184,6 +204,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         priceNote: 'Starts at',
         weight: '300g',
         category: 'Gourmet Gift Boxes',
+        img: 'assets/images/create-your-own-box.jpg',
       },
     ],
   },
@@ -197,6 +218,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 650,
         weight: '150g',
         category: 'Seasonal Specialties',
+        img: 'assets/images/pumpkin-spice-caramel.jpg',
       },
       {
         id: 6002,
@@ -205,6 +227,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 590,
         weight: '200g',
         category: 'Seasonal Specialties',
+        img: 'assets/images/peppermint-bark.jpg',
       },
       {
         id: 6003,
@@ -213,6 +236,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 560,
         weight: '100g',
         category: 'Seasonal Specialties',
+        img: 'assets/images/mango-caramel-white.jpg',
       },
       {
         id: 6004,
@@ -221,6 +245,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 880,
         weight: '300g',
         category: 'Seasonal Specialties',
+        img: 'assets/images/easter-egg-hunt-kit.jpg',
       },
       {
         id: 6005,
@@ -229,6 +254,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 1250,
         weight: '350g',
         category: 'Seasonal Specialties',
+        img: 'assets/images/valentines-heart-collection.jpg',
       },
       {
         id: 6006,
@@ -237,6 +263,7 @@ export const CATALOG_DATA: ProductCategory[] = [
         price: 620,
         weight: '150g (3 blocks)',
         category: 'Seasonal Specialties',
+        img: 'assets/images/spicy-maya-hot-chocolate.jpg',
       },
     ],
   },
