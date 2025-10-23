@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ApiService } from '../../services/api.service';
 import {
   IonHeader,
   IonToolbar,
@@ -80,7 +81,14 @@ export class OffersPage {
       target: { sort: 'popular' },
     },
   ];
-  constructor(private router: Router) {}
+  constructor(private router: Router, private api: ApiService) {
+    this.api.getOffers().subscribe({
+      next: (arr) => {
+        if (Array.isArray(arr) && arr.length) this.offers = arr as any;
+      },
+      error: () => {},
+    });
+  }
   goTo(o: { target?: any; subtitle: string }) {
     const queryParams = o.target ?? { sort: 'priceAsc' };
     this.router.navigate(['/catalog'], { queryParams });

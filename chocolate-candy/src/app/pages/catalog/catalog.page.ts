@@ -12,12 +12,14 @@ import {
   IonSegment,
   IonSegmentButton,
   IonLabel,
+  IonToast,
 } from '@ionic/angular/standalone';
 import { CartService } from '../../cart/cart.service';
 import { ActivatedRoute } from '@angular/router';
 import { CATALOG_DATA, FLAT_PRODUCTS } from '../../data/catalog.data';
 import type { Product, ProductCategory } from '../../models/product.model';
 import { ProductListComponent } from '../../components/product-list/product-list.component';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   standalone: true,
@@ -62,6 +64,12 @@ import { ProductListComponent } from '../../components/product-list/product-list
         [categories]="visibleCategories"
         (add)="addToCart($event)"
       ></app-product-list>
+      <ion-toast
+        [isOpen]="toastOpen"
+        message="Added to cart"
+        duration="1200"
+        (ionToastDidDismiss)="toastOpen = false"
+      ></ion-toast>
     </ion-content>
   `,
   styles: [
@@ -99,6 +107,7 @@ import { ProductListComponent } from '../../components/product-list/product-list
     IonSegment,
     IonSegmentButton,
     IonLabel,
+    IonToast,
     ProductListComponent,
   ],
 })
@@ -109,6 +118,7 @@ export class CatalogPage {
   activeCat: string = 'All';
   categoriesData: ProductCategory[] = CATALOG_DATA;
   products: Product[] = FLAT_PRODUCTS;
+  toastOpen = false;
   get visibleCategories(): ProductCategory[] {
     const filterFn = (p: Product) =>
       (!this.query ||
@@ -119,7 +129,11 @@ export class CatalogPage {
       .filter((c) => c.products.length > 0);
   }
 
-  constructor(private cart: CartService, private route: ActivatedRoute) {
+  constructor(
+    private cart: CartService,
+    private route: ActivatedRoute,
+    private api: ApiService
+  ) {
     // derive categories list from data
     const set = new Set<string>(['All']);
     this.categoriesData.forEach((cat) => set.add(cat.name));
@@ -134,6 +148,48 @@ export class CatalogPage {
       const s = qp.get('sort');
       if (s === 'priceAsc' || s === 'priceDesc' || s === 'popular')
         this.sort = s;
+    });
+
+    // Try to hydrate from backend (fallback to local data already assigned)
+    this.api.getCategories().subscribe({
+      next: (cats) => {
+        const set = new Set<string>(['All']);
+        cats.forEach((c: any) => set.add(typeof c === 'string' ? c : c.name));
+        this.categories = Array.from(set);
+      },
+      error: () => {},
+    });
+    this.api.getProducts().subscribe({
+      next: (arr) => {
+        // Transform flat list into category groups
+        const byCat = new Map<string, Product[]>();
+        arr.forEach((p: any) => {
+          const cat = p.category || 'Other';
+          if (!byCat.has(cat)) byCat.set(cat, []);
+          byCat.get(cat)!.push({
+            id: p.id,
+            name: p.name,
+            description: p.description ?? '',
+            price: p.price,
+            weight: p.weight ?? '100g',
+            category: cat,
+            img: p.img,
+          });
+        });
+        this.categoriesData = Array.from(byCat.entries()).map(
+          ([name, products]) => ({ name, products })
+        );
+        this.products = arr.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description ?? '',
+          price: p.price,
+          weight: p.weight ?? '100g',
+          category: p.category,
+          img: p.img,
+        }));
+      },
+      error: () => {},
     });
   }
 
@@ -157,5 +213,6 @@ export class CatalogPage {
 
   addToCart(p: Product) {
     this.cart.add({ id: p.id, name: p.name, price: p.price, img: p.img });
+    this.toastOpen = true;
   }
 }

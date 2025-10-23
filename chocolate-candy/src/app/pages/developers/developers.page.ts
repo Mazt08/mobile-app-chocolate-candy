@@ -14,6 +14,7 @@ import {
   IonButton,
   IonIcon,
 } from '@ionic/angular/standalone';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   standalone: true,
@@ -119,4 +120,12 @@ export class DevelopersPage {
       img: '',
     },
   ];
+  constructor(private api: ApiService) {
+    this.api.getDevelopers().subscribe({
+      next: (arr) => {
+        if (Array.isArray(arr) && arr.length) this.devs = arr as any;
+      },
+      error: () => {},
+    });
+  }
 }

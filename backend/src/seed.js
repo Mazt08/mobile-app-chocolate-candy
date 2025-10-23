@@ -1,0 +1,80 @@
+const { save, load } = require("./db");
+
+function run() {
+  const db = load();
+  db.categories = [
+    { name: "Dark" },
+    { name: "Milk" },
+    { name: "Nuts" },
+    { name: "Caramel" },
+  ];
+  db.products = [
+    { id: 1, name: "Dark Truffle", price: 129, category: "Dark", img: "" },
+    { id: 2, name: "Milk Caramel", price: 99, category: "Milk", img: "" },
+    { id: 3, name: "70% Cacao Bar", price: 149, category: "Dark", img: "" },
+    { id: 4, name: "Hazelnut Praline", price: 141, category: "Nuts", img: "" },
+    { id: 5, name: "Almond Crunch", price: 129, category: "Nuts", img: "" },
+  ];
+  db.offers = [
+    {
+      title: "Buy 1 Get 1",
+      subtitle: "Dark Truffle BOGO this week",
+      badge: "New",
+      target: { category: "Dark" },
+    },
+    {
+      title: "15% Off",
+      subtitle: "Orders over ₱500",
+      badge: "Save",
+      target: { sort: "priceAsc" },
+    },
+    {
+      title: "Nutty Deals",
+      subtitle: "Best picks with nuts",
+      badge: "Yum",
+      target: { category: "Nuts" },
+    },
+    {
+      title: "Premium Picks",
+      subtitle: "Top-rated treats",
+      badge: "Hot",
+      target: { sort: "popular" },
+    },
+  ];
+  db.orders = [
+    {
+      id: 1024,
+      date: "Oct 1, 2025",
+      status: "Delivered",
+      items: [
+        { id: 1, name: "Dark Truffle", price: 129, qty: 2 },
+        { id: 4, name: "Hazelnut Praline", price: 141, qty: 1 },
+      ],
+      total: 399,
+    },
+    {
+      id: 1025,
+      date: "Oct 7, 2025",
+      status: "Processing",
+      items: [
+        { id: 2, name: "Milk Caramel", price: 99, qty: 1 },
+        { id: 5, name: "Almond Crunch", price: 129, qty: 1 },
+      ],
+      total: 228,
+    },
+  ];
+  db.developers = [
+    {
+      name: "John Reex O. Aspiras",
+      role: "Fullstack Developer",
+      github: "https://github.com/Mazt08",
+      img: "https://github.com/Mazt08.png",
+    },
+    { name: "Kurt Justine A. Avenido", role: "No Role", img: "" },
+    { name: "Railey Modrigo", role: "No Roles", img: "" },
+  ];
+  save(db);
+  console.log("Seed complete.");
+}
+
+run();

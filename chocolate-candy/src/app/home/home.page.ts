@@ -17,6 +17,7 @@ import {
   IonCardTitle,
   IonCardContent,
   IonImg,
+  IonToast,
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { CartService } from '../cart/cart.service';
@@ -43,6 +44,7 @@ import { CartService } from '../cart/cart.service';
     IonCardTitle,
     IonCardContent,
     IonImg,
+    IonToast,
   ],
 })
 export class HomePage {
@@ -79,6 +81,7 @@ export class HomePage {
   ];
 
   constructor(private router: Router, private cart: CartService) {}
+  toastOpen = false;
 
   goToCatalog() {
     this.router.navigate(['/catalog']);
@@ -91,5 +94,6 @@ export class HomePage {
   }
   addToCart(p: any) {
     this.cart.add({ id: p.id, name: p.name, price: p.price, img: p.img });
+    this.toastOpen = true;
   }
 }

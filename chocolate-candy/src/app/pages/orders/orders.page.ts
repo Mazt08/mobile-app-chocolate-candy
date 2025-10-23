@@ -18,6 +18,7 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { CartService } from '../../cart/cart.service';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   standalone: true,
@@ -125,7 +126,14 @@ export class OrdersPage {
     },
   ];
 
-  constructor(private cart: CartService) {}
+  constructor(private cart: CartService, private api: ApiService) {
+    this.api.getOrders().subscribe({
+      next: (arr) => {
+        if (Array.isArray(arr) && arr.length) this.orders = arr as any;
+      },
+      error: () => {},
+    });
+  }
 
   filteredOrders() {
     if (this.filter === 'all') return this.orders;

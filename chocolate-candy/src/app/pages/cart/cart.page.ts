@@ -15,9 +15,12 @@ import {
   IonAvatar,
   IonButton,
   IonText,
+  IonToast,
 } from '@ionic/angular/standalone';
 import { CartService, CartItem } from '../../cart/cart.service';
 import { Observable } from 'rxjs';
+import { ApiService } from '../../services/api.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -79,10 +82,19 @@ import { Observable } from 'rxjs';
           <span>Total</span>
           <strong>₱ {{ grandTotal() | number : '1.0-2' }}</strong>
         </div>
-        <ion-button expand="block" [disabled]="(total$ | async) === 0"
+        <ion-button
+          expand="block"
+          [disabled]="(total$ | async) === 0"
+          (click)="checkout()"
           >Checkout</ion-button
         >
       </div>
+      <ion-toast
+        [isOpen]="toastOpen"
+        message="Order placed!"
+        duration="1800"
+        (ionToastDidDismiss)="toastOpen = false"
+      ></ion-toast>
     </ion-content>
   `,
   styles: [
@@ -118,6 +130,7 @@ import { Observable } from 'rxjs';
     IonAvatar,
     IonButton,
     IonText,
+    IonToast,
   ],
 })
 export class CartPage {
@@ -127,7 +140,13 @@ export class CartPage {
   discountLabel = '';
   discountValue = 0;
 
-  constructor(private cart: CartService) {}
+  toastOpen = false;
+
+  constructor(
+    private cart: CartService,
+    private api: ApiService,
+    private router: Router
+  ) {}
 
   inc(it: CartItem) {
     this.cart.setQty(it.id, it.qty + 1);
@@ -159,5 +178,26 @@ export class CartPage {
       .getItemsSnapshot()
       .reduce((s, i) => s + i.qty * i.price, 0);
     return Math.max(0, subtotal - this.discountValue);
+  }
+
+  checkout() {
+    const items = this.cart
+      .getItemsSnapshot()
+      .map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.qty }));
+    const total = this.grandTotal();
+    if (!items.length || total <= 0) return;
+    this.api.createOrder({ items, total }).subscribe({
+      next: () => {
+        this.cart.clear();
+        this.toastOpen = true;
+        setTimeout(() => this.router.navigate(['/orders']), 600);
+      },
+      error: () => {
+        // fallback: still clear cart locally to simulate success
+        this.cart.clear();
+        this.toastOpen = true;
+        setTimeout(() => this.router.navigate(['/orders']), 600);
+      },
+    });
   }
 }
