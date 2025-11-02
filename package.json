@@ -2,10 +2,9 @@
   "name": "chocoapp",
   "version": "1.0.0",
   "private": true,
-  "description": "Chocolate Candy Ionic App",
   "scripts": {
-    "start": "npx serve -s www -l 8100",
-    "build": "ionic build"
+    "build": "ionic build",
+    "start": "npx serve -s www -l $PORT"
   },
   "dependencies": {
     "serve": "^14.2.5"
