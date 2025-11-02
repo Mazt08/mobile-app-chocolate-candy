@@ -7,6 +7,8 @@ export interface MenuItem {
   // Controls which users can see the item
   // 'any' (default), 'guest' (logged-out), or 'user' (logged-in)
   visibleFor?: 'any' | 'guest' | 'user';
+  // Optional: restrict to specific roles when logged in
+  visibleForRole?: Array<'admin' | 'staff' | 'user'>;
 }
 
 export interface MenuSection {
@@ -84,6 +86,18 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
         icon: 'information-circle-outline',
       },
       { title: 'Developers', route: '/developers', icon: 'code-slash-outline' },
+    ],
+  },
+  {
+    label: 'Admin',
+    items: [
+      {
+        title: 'Users',
+        route: '/admin/users',
+        icon: 'people-outline',
+        visibleFor: 'user',
+        visibleForRole: ['admin'],
+      },
     ],
   },
 ];

@@ -29,10 +29,40 @@ export class ApiService {
     return this.http.get<any[]>(`${this.base}/developers`);
   }
 
+  health() {
+    return this.http.get<{ ok: boolean }>(`${this.base}/health`);
+  }
+
   createOrder(payload: {
     items: Array<{ id: number; name: string; price: number; qty: number }>;
     total: number;
   }) {
     return this.http.post<any>(`${this.base}/orders`, payload);
+  }
+
+  // Auth endpoints
+  register(payload: {
+    name: string;
+    username: string;
+    email: string;
+    password: string;
+    role?: 'admin' | 'staff' | 'user';
+  }) {
+    return this.http.post<{ user: any; token: string }>(
+      `${this.base}/register`,
+      payload
+    );
+  }
+
+  login(identity: string, password: string) {
+    return this.http.post<{ user: any; token: string }>(`${this.base}/login`, {
+      identity,
+      password,
+    });
+  }
+
+  // Admin
+  getAdminUsers() {
+    return this.http.get<any[]>(`${this.base}/admin/users`);
   }
 }

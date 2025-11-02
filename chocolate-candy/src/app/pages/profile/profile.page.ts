@@ -37,6 +37,7 @@ import { AuthService } from '../../auth/auth.service';
         /></ion-avatar>
         <h2 class="ion-padding-top">{{ u.name }}</h2>
         <ion-text color="medium">{{ u.email }}</ion-text>
+        <div *ngIf="u.role" class="role-pill">Role: {{ u.role }}</div>
       </div>
       <ion-list>
         <ion-item>
@@ -70,6 +71,15 @@ import { AuthService } from '../../auth/auth.service';
     `
       h2 {
         margin: 8px 0 0;
+      }
+      .role-pill {
+        margin-top: 4px;
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: var(--ion-color-light);
+        color: var(--ion-color-medium-contrast, #333);
+        font-size: 12px;
       }
     `,
   ],

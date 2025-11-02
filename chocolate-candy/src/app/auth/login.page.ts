@@ -141,11 +141,22 @@ export class LoginPage {
     private router: Router
   ) {}
 
-  submit() {
+  async submit() {
     if (this.form.invalid) return;
     const { email, password } = this.form.getRawValue();
-    this.auth.login(email!, password!);
-    this.router.navigate(['/home']);
+    try {
+      await this.auth.login(email!, password!);
+      this.router.navigate(['/home']);
+    } catch (e: any) {
+      const status = e?.status ?? 0;
+      if (status === 0) {
+        alert(
+          'Cannot reach API. Please start the backend at http://localhost:3000 or update environment.apiBase.'
+        );
+      } else {
+        alert(e?.error?.error || 'Login failed');
+      }
+    }
   }
 
   goRegister() {

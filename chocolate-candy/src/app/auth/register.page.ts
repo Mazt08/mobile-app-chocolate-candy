@@ -181,7 +181,7 @@ export class RegisterPage {
     private router: Router
   ) {}
 
-  submit() {
+  async submit() {
     if (this.form.invalid) return;
     const { username, name, email, password, confirm } =
       this.form.getRawValue();
@@ -189,8 +189,30 @@ export class RegisterPage {
       alert('Passwords do not match');
       return;
     }
-    this.auth.register(name!, username!, email!, password!);
-    this.router.navigate(['/home']);
+    try {
+      await this.auth.register(
+        name!,
+        username!,
+        (email || '').trim(),
+        password!
+      );
+      this.router.navigate(['/home']);
+    } catch (e: any) {
+      const msg = e?.error?.error || e?.message || 'Registration failed';
+      const status = e?.status ?? 0;
+      if (status === 0) {
+        alert(
+          'Cannot reach API at ' +
+            (window as any).location?.origin
+              .replace(':8100', ':3000')
+              .replace(':5173', ':3000') +
+            '\nPlease start the backend or update environment.apiBase.'
+        );
+      } else {
+        const msg = e?.error?.error || e?.message || 'Registration failed';
+        alert(msg);
+      }
+    }
   }
 
   goLogin() {

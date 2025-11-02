@@ -73,6 +73,32 @@ function run() {
     { name: "Kurt Justine A. Avenido", role: "No Role", img: "" },
     { name: "Railey Modrigo", role: "No Roles", img: "" },
   ];
+  db.users = [
+    {
+      id: 1,
+      name: "Admin One",
+      username: "admin",
+      email: "admin@choco.local",
+      password: "admin123!",
+      role: "admin",
+    },
+    {
+      id: 2,
+      name: "Staff One",
+      username: "staff",
+      email: "staff@choco.local",
+      password: "staff123!",
+      role: "staff",
+    },
+    {
+      id: 3,
+      name: "Sample User",
+      username: "user",
+      email: "user@choco.local",
+      password: "user123!",
+      role: "user",
+    },
+  ];
   save(db);
   console.log("Seed complete.");
 }

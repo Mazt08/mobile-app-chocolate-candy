@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./dbDriver");
+const { signToken, authRequired, roleRequired, loadUser } = require("./auth");
 const config = require("./config");
 
 const app = express();
@@ -62,24 +63,84 @@ app.get("/api/orders", async (_req, res) => {
   }
 });
 
-app.post("/api/orders", async (req, res) => {
+app.post("/api/register", async (req, res) => {
   try {
-    const payload = req.body || {};
-    const data = await Promise.resolve(db.createOrder(payload));
-    res.status(201).json(data);
+    const { name, username, email, password, role } = req.body || {};
+    if (!name || !username || !email || !password) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+    // Normalize email/username to reduce duplicate collisions
+    const emailId = String(email).trim();
+    const usernameId = String(username).trim();
+    const existing = await Promise.resolve(
+      db.findUserByEmailOrUsername(emailId)
+    );
+    const existing2 = await Promise.resolve(
+      db.findUserByEmailOrUsername(usernameId)
+    );
+    if (existing || existing2) {
+      return res.status(409).json({ error: "User already exists" });
+    }
+    const created = await Promise.resolve(
+      db.createUser({
+        name,
+        username: usernameId,
+        email: emailId,
+        password,
+        role,
+      })
+    );
+    const token = signToken(created);
+    return res.status(201).json({ user: created, token });
+  } catch (e) {
+    const msg = e && e.message ? e.message : String(e);
+    // Handle common MySQL errors gracefully
+    if (msg.includes("ER_DUP_ENTRY") || /duplicate/i.test(msg)) {
+      return res.status(409).json({ error: "User already exists" });
+    }
+    if (/ECONNREFUSED|connect ECONNREFUSED|ENOTFOUND|ETIMEDOUT/i.test(msg)) {
+      return res.status(503).json({ error: "Database unavailable" });
+    }
+    return res.status(500).json({ error: msg });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { identity, password } = req.body || {};
+    if (!identity || !password)
+      return res.status(400).json({ error: "Missing credentials" });
+    const user = await Promise.resolve(db.findUserByEmailOrUsername(identity));
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    // JSON driver stores plaintext; MySQL driver stores bcrypt hash.
+    const ok = user.password
+      ? require("bcryptjs").compareSync(password, user.password) ||
+        user.password === password
+      : false;
+    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+    const { password: _pw, ...safe } = user;
+    const token = signToken(safe);
+    res.json({ user: safe, token });
   } catch (e) {
     res.status(500).json({ error: String(e.message || e) });
   }
 });
 
-app.get("/api/developers", async (_req, res) => {
-  try {
-    const data = await Promise.resolve(db.getDevelopers());
-    res.json(data);
-  } catch (e) {
-    res.status(500).json({ error: String(e.message || e) });
+// Example secured admin endpoint
+app.get(
+  "/api/admin/users",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (_req, res) => {
+    try {
+      const users = await Promise.resolve(db.listUsers());
+      res.json(users);
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
   }
-});
+);
 
 app.listen(PORT, () => {
   console.log(`Choco backend running on http://localhost:${PORT}`);

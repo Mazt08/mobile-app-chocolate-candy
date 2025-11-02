@@ -196,13 +196,21 @@ export class SideMenuComponent implements OnInit, OnDestroy {
 
   private filterSectionsByVisibility(sections: MenuSection[]): MenuSection[] {
     const isLoggedIn = !!this.user?.isLoggedIn;
+    const role = this.user?.role as 'admin' | 'staff' | 'user' | undefined;
     return sections.map((section) => ({
       label: section.label,
       items: section.items.filter((item) => {
         const vis = item.visibleFor || 'any';
         if (vis === 'any') return true;
         if (vis === 'guest') return !isLoggedIn;
-        if (vis === 'user') return isLoggedIn;
+        if (vis === 'user') {
+          if (!isLoggedIn) return false;
+          if (item.visibleForRole && role) {
+            return item.visibleForRole.includes(role as any);
+          }
+          // If no specific role restriction, show to any logged-in user
+          return !item.visibleForRole;
+        }
         return true;
       }),
     }));

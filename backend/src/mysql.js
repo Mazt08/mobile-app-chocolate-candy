@@ -1,5 +1,6 @@
 const mysql = require("mysql2/promise");
 const config = require("./config");
+const bcrypt = require("bcryptjs");
 
 let pool;
 function getPool() {
@@ -153,4 +154,33 @@ module.exports = {
   getOrders,
   getDevelopers,
   createOrder,
+  // Users API (used by server routes)
+  async findUserByEmailOrUsername(identity) {
+    const [rows] = await getPool().query(
+      "SELECT id, name, username, email, password, role FROM users WHERE email = ? OR username = ? LIMIT 1",
+      [identity, identity]
+    );
+    return rows[0];
+  },
+  async findUserById(id) {
+    const [rows] = await getPool().query(
+      "SELECT id, name, username, email, password, role FROM users WHERE id = ? LIMIT 1",
+      [id]
+    );
+    return rows[0];
+  },
+  async createUser({ name, username, email, password, role }) {
+    const hashed = await bcrypt.hash(password, 10);
+    const [res] = await getPool().query(
+      "INSERT INTO users (name, username, email, password, role) VALUES (?,?,?,?,?)",
+      [name, username, email, hashed, role || "user"]
+    );
+    return { id: res.insertId, name, username, email, role: role || "user" };
+  },
+  async listUsers() {
+    const [rows] = await getPool().query(
+      "SELECT id, name, username, email, role FROM users ORDER BY id"
+    );
+    return rows;
+  },
 };

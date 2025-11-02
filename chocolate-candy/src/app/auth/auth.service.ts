@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { ApiService } from '../services/api.service';
 
 export interface AuthUser {
   name: string;
@@ -8,6 +9,9 @@ export interface AuthUser {
   avatar?: string | null;
   points?: number;
   isLoggedIn: boolean;
+  role?: 'admin' | 'staff' | 'user';
+  id?: number;
+  token?: string;
 }
 
 const STORAGE_KEY = 'chocoexpressUser';
@@ -17,7 +21,7 @@ export class AuthService {
   private _user$ = new BehaviorSubject<AuthUser | null>(null);
   public readonly user$ = this._user$.asObservable();
 
-  constructor() {
+  constructor(private api: ApiService) {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -30,12 +34,16 @@ export class AuthService {
     return this._user$.value;
   }
 
-  login(email: string, _password: string) {
-    // Demo only: accept any email/password
-    const name = email.split('@')[0];
+  async login(identity: string, password: string) {
+    // Calls backend to validate credentials; identity can be email or username
+    const res = await firstValueFrom(this.api.login(identity, password));
     const user: AuthUser = {
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      email,
+      name: res.user?.name || res.user?.username || 'User',
+      username: res.user?.username,
+      email: res.user?.email,
+      role: res.user?.role as any,
+      id: res.user?.id,
+      token: res.token,
       avatar: null,
       points: 50,
       isLoggedIn: true,
@@ -44,11 +52,22 @@ export class AuthService {
     this._user$.next(user);
   }
 
-  register(name: string, username: string, email: string, _password: string) {
+  async register(
+    name: string,
+    username: string,
+    email: string,
+    password: string
+  ) {
+    const res = await firstValueFrom(
+      this.api.register({ name, username, email, password })
+    );
     const user: AuthUser = {
-      name,
-      username,
-      email,
+      name: res.user?.name,
+      username: res.user?.username,
+      email: res.user?.email,
+      role: (res.user?.role as any) || 'user',
+      id: res.user?.id,
+      token: res.token,
       avatar: null,
       points: 0,
       isLoggedIn: true,

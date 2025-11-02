@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const mysql = require("mysql2/promise");
 const config = require("./config");
+const bcrypt = require("bcryptjs");
 
 async function run() {
   const sql = fs.readFileSync(path.join(__dirname, "db.sql"), "utf-8");
@@ -14,7 +15,32 @@ async function run() {
   });
   try {
     await conn.query(sql);
-    console.log("MySQL seed complete.");
+    // Insert default users with hashed passwords
+    const adminPass = await bcrypt.hash("admin123!", 10);
+    const staffPass = await bcrypt.hash("staff123!", 10);
+    const userPass = await bcrypt.hash("user123!", 10);
+    await conn.changeUser({ database: config.MYSQL.database });
+    await conn.query(
+      "INSERT INTO users (name, username, email, password, role) VALUES (?,?,?,?,?),(?,?,?,?,?),(?,?,?,?,?)",
+      [
+        "Admin One",
+        "admin",
+        "admin@choco.local",
+        adminPass,
+        "admin",
+        "Staff One",
+        "staff",
+        "staff@choco.local",
+        staffPass,
+        "staff",
+        "Sample User",
+        "user",
+        "user@choco.local",
+        userPass,
+        "user",
+      ]
+    );
+    console.log("MySQL seed complete (schema + default users).");
   } finally {
     await conn.end();
   }

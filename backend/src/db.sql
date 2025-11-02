@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS offers;
 DROP TABLE IF EXISTS developers;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -41,6 +42,15 @@ CREATE TABLE developers (
   role VARCHAR(100) NOT NULL,
   github VARCHAR(300) NULL,
   img VARCHAR(500) NULL
+);
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(200) NOT NULL,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  email VARCHAR(200) NOT NULL UNIQUE,
+  password VARCHAR(200) NOT NULL,
+  role ENUM('admin','staff','user') NOT NULL DEFAULT 'user'
 );
 
 CREATE TABLE orders (

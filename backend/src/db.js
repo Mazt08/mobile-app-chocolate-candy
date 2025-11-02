@@ -14,6 +14,7 @@ function load() {
       offers: [],
       orders: [],
       developers: [],
+      users: [],
     };
   }
 }
@@ -39,6 +40,37 @@ module.exports = {
   },
   getDevelopers() {
     return load().developers;
+  },
+  findUserByEmailOrUsername(identity) {
+    const db = load();
+    return (db.users || []).find(
+      (u) => u.email === identity || u.username === identity
+    );
+  },
+  findUserById(id) {
+    const db = load();
+    return (db.users || []).find((u) => u.id === Number(id));
+  },
+  createUser({ name, username, email, password, role }) {
+    const db = load();
+    const nextId =
+      (db.users?.reduce((m, u) => Math.max(m, u.id || 0), 0) || 0) + 1;
+    const user = {
+      id: nextId,
+      name,
+      username,
+      email,
+      password, // NOTE: in JSON driver, stored as plain text for demo only
+      role: role || "user",
+    };
+    db.users = [...(db.users || []), user];
+    save(db);
+    const { password: _pw, ...safe } = user;
+    return safe;
+  },
+  listUsers() {
+    const db = load();
+    return (db.users || []).map(({ password, ...safe }) => safe);
   },
   createOrder(payload) {
     const db = load();
