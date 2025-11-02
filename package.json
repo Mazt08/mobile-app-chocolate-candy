@@ -2,7 +2,11 @@
   "dependencies": {
     "serve": "^14.2.5"
   },
+  "devDependencies": {
+    "@angular/cli": "^18.0.0",
+    "@ionic/cli": "^7.0.0"
+  },
   "scripts": {
-  "build": "ionic build"
-}
+    "build": "ionic build"
+  }
 }
