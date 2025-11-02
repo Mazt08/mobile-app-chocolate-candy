@@ -1,12 +1,17 @@
 {
+  "name": "chocoapp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chocolate Candy Ionic App",
+  "scripts": {
+    "start": "npx serve -s www -l 8100",
+    "build": "ionic build"
+  },
   "dependencies": {
     "serve": "^14.2.5"
   },
   "devDependencies": {
     "@angular/cli": "^18.0.0",
     "@ionic/cli": "^7.0.0"
-  },
-  "scripts": {
-    "build": "ionic build"
   }
 }
