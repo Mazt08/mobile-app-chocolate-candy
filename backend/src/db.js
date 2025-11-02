@@ -35,8 +35,13 @@ module.exports = {
   getOffers() {
     return load().offers;
   },
-  getOrders() {
-    return load().orders;
+  getOrders(opts) {
+    const db = load();
+    const orders = db.orders || [];
+    if (opts?.userId) {
+      return orders.filter((o) => o.user?.id === Number(opts.userId));
+    }
+    return orders;
   },
   getDevelopers() {
     return load().developers;
@@ -93,6 +98,22 @@ module.exports = {
         qty: Number(i.qty),
       })),
     };
+    // Attach minimal user info when available
+    if (payload?.userId) {
+      const user = (db.users || []).find(
+        (u) => u.id === Number(payload.userId)
+      );
+      if (user) {
+        order.user = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        };
+      } else {
+        order.user = { id: Number(payload.userId) };
+      }
+    }
     db.orders = [order, ...(db.orders || [])];
     save(db);
     return order;

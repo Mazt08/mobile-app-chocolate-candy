@@ -64,11 +64,19 @@ async function getOffers() {
   }));
 }
 
-async function getOrders() {
-  // Fetch orders and items, then group
-  const [orders] = await getPool().query(
-    "SELECT id, date, status, total FROM orders ORDER BY id DESC"
-  );
+async function getOrders(opts) {
+  // Fetch orders, join users, and items, then group
+  let sql = `SELECT o.id, o.date, o.status, o.total, o.user_id,
+                    u.name AS user_name, u.email AS user_email
+               FROM orders o
+               LEFT JOIN users u ON u.id = o.user_id`;
+  const params = [];
+  if (opts?.userId) {
+    sql += ` WHERE o.user_id = ?`;
+    params.push(opts.userId);
+  }
+  sql += ` ORDER BY o.id DESC`;
+  const [orders] = await getPool().query(sql, params);
   if (!orders.length) return [];
   const ids = orders.map((o) => o.id);
   const [items] = await getPool().query(
@@ -78,7 +86,18 @@ async function getOrders() {
     ids
   );
   const byOrder = new Map();
-  for (const o of orders) byOrder.set(o.id, { ...o, items: [] });
+  for (const o of orders) {
+    const base = {
+      id: o.id,
+      date: o.date,
+      status: o.status,
+      total: o.total,
+      items: [],
+    };
+    if (o.user_id)
+      base["user"] = { id: o.user_id, name: o.user_name, email: o.user_email };
+    byOrder.set(o.id, base);
+  }
   for (const it of items)
     byOrder
       .get(it.order_id)
@@ -110,8 +129,8 @@ async function createOrder(payload) {
     const status = "Processing";
     const total = Number(payload?.total || 0);
     await conn.query(
-      "INSERT INTO orders (id, date, status, total) VALUES (?, ?, ?, ?)",
-      [id, date, status, total]
+      "INSERT INTO orders (id, date, status, total, user_id) VALUES (?, ?, ?, ?, ?)",
+      [id, date, status, total, payload?.userId || null]
     );
     const items = (payload?.items || []).map((i) => [
       id,

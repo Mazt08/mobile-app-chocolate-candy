@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "serve": "^14.2.5"
+  },
+  "scripts": {
+  "build": "ionic build"
+}
+}

@@ -51,6 +51,12 @@ import { ApiService } from '../../services/api.service';
             <p>
               {{ o.date }} • {{ o.items.length }} items • ₱
               {{ o.total | number : '1.0-2' }}
+              <ng-container *ngIf="o.user">
+                • by {{ o.user.name || 'User #' + o.user.id }}
+                <ng-container *ngIf="o.user.email"
+                  >({{ o.user.email }})</ng-container
+                >
+              </ng-container>
             </p>
             <div class="items" *ngIf="o.expanded">
               <div class="item-row" *ngFor="let it of o.items">

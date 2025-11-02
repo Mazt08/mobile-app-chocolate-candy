@@ -54,10 +54,24 @@ app.get("/api/offers", async (_req, res) => {
   }
 });
 
-app.get("/api/orders", async (_req, res) => {
+// Orders: require auth and return only current user's orders
+app.get("/api/orders", authRequired, loadUser, async (req, res) => {
   try {
-    const data = await Promise.resolve(db.getOrders());
+    const data = await Promise.resolve(db.getOrders({ userId: req.user.id }));
     res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// Create order: associates the current user to the order
+app.post("/api/orders", authRequired, loadUser, async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const created = await Promise.resolve(
+      db.createOrder({ ...payload, userId: req.user.id })
+    );
+    res.status(201).json(created);
   } catch (e) {
     res.status(500).json({ error: String(e.message || e) });
   }
