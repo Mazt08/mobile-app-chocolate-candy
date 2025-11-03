@@ -1,0 +1,3 @@
+cd chocolate-candy
+npm ci
+npm run build

@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "ionic build",
-    "start": "npx serve -s www -l $PORT"
+    "build": "npm ci --prefix chocolate-candy && npm run build --prefix chocolate-candy",
+    "start": "npx serve -s chocolate-candy/www -l $PORT"
   },
   "dependencies": {
     "@angular/animations": "^18.0.0",
