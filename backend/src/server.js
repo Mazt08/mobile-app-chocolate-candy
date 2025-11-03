@@ -10,6 +10,15 @@ const PORT = config.PORT;
 app.use(cors());
 app.use(express.json());
 
+// Friendly root message so visiting the backend URL doesn't show a 404
+app.get("/", (_req, res) => {
+  res
+    .status(200)
+    .send(
+      "Chocolate Candy API is running. Try GET /api/health. The frontend is deployed as a separate Static Site."
+    );
+});
+
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
 app.get("/api/categories", async (_req, res) => {
