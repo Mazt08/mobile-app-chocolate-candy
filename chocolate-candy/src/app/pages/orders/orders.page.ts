@@ -20,6 +20,30 @@ import {
 import { CartService } from '../../cart/cart.service';
 import { ApiService } from '../../services/api.service';
 
+// Minimal shape for an order coming from the API
+interface OrderItem {
+  id: number;
+  name: string;
+  price: number;
+  qty: number;
+}
+
+interface OrderUser {
+  id: number;
+  name?: string;
+  email?: string;
+}
+
+interface Order {
+  id: number;
+  date: string;
+  items: OrderItem[];
+  total: number;
+  status: 'Processing' | 'Delivered' | string;
+  expanded?: boolean;
+  user?: OrderUser; // present when backend includes who ordered
+}
+
 @Component({
   standalone: true,
   selector: 'app-orders',
@@ -107,7 +131,7 @@ import { ApiService } from '../../services/api.service';
 })
 export class OrdersPage {
   filter: 'all' | 'processing' | 'delivered' = 'all';
-  orders = [
+  orders: Order[] = [
     {
       id: 1024,
       date: 'Oct 1, 2025',
@@ -135,7 +159,7 @@ export class OrdersPage {
   constructor(private cart: CartService, private api: ApiService) {
     this.api.getOrders().subscribe({
       next: (arr) => {
-        if (Array.isArray(arr) && arr.length) this.orders = arr as any;
+        if (Array.isArray(arr) && arr.length) this.orders = arr as Order[];
       },
       error: () => {},
     });
