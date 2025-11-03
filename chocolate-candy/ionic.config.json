@@ -1,5 +1,7 @@
 {
-  "name": "ionic-app-base",
-  "integrations": {},
-  "type": "angular-standalone"
+  "name": "chocolate-candy",
+  "type": "angular",
+  "integrations": {
+    "capacitor": {}
+  }
 }

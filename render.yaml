@@ -1,0 +1,43 @@
+services:
+  # Frontend: Ionic Angular app as a Static Site
+  - type: static_site
+    name: chocolate-candy-frontend
+    rootDir: chocolate-candy
+    buildCommand: npm ci && npm run build
+    staticPublishPath: www
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+    # Optional: SPA rewrite for Angular routes
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # Backend: Node/Express API
+  - type: web
+    name: chocolate-candy-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: node src/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PORT
+        value: 3000
+      - key: DB_DRIVER
+        value: mysql
+      - key: JWT_SECRET
+        generateValue: true
+      # Set these to your MySQL instance (Render PostgreSQL is not used here)
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_PORT
+        value: 3306
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_DATABASE
+        sync: false
