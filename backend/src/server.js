@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 const db = require("./dbDriver");
 const { signToken, authRequired, roleRequired, loadUser } = require("./auth");
 const config = require("./config");
@@ -168,3 +170,24 @@ app.get(
 app.listen(PORT, () => {
   console.log(`Choco backend running on http://localhost:${PORT}`);
 });
+
+// -------------------- Optional SPA hosting (single-service mode) --------------------
+// If the frontend has been built into chocolate-candy/www, serve it statically from here.
+// This lets a single Web Service host both API and the Angular SPA on Render free tier.
+try {
+  const webRoot = path.join(__dirname, "..", "..", "chocolate-candy", "www");
+  if (fs.existsSync(webRoot)) {
+    app.use(express.static(webRoot));
+    // SPA fallback: send index.html for non-API routes
+    app.get(/^(?!\/api\/).*/, (_req, res) => {
+      res.sendFile(path.join(webRoot, "index.html"));
+    });
+    console.log(`[SPA] Serving frontend from ${webRoot}`);
+  } else {
+    console.log(
+      "[SPA] Frontend build not found (chocolate-candy/www). Skipping static hosting."
+    );
+  }
+} catch (e) {
+  console.warn("[SPA] Static hosting setup failed:", e?.message || e);
+}

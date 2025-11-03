@@ -1,14 +1,9 @@
-export const environment = {
-  production: true,
-  apiBase: 'https://<your-backend>.onrender.com/api',
-};
-
 services:
   # Frontend: Ionic Angular app as a Static Site
   - type: static_site
     name: chocolate-candy-frontend
     rootDir: chocolate-candy
-    buildCommand: cd chocolate-candy && npm ci && npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: www
     envVars:
       - key: NODE_VERSION
