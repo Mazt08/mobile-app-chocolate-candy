@@ -7,7 +7,7 @@ if (config.DB_DRIVER === "mysql") {
     console.log("[DB] Using MySQL driver");
   } catch (e) {
     console.warn(
-      "[DB] MySQL driver not available, falling back to JSON:",
+      "[DB] MySQL module not available, falling back to JSON:",
       e.message
     );
     impl = require("./db");

@@ -8,57 +8,17 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <section class="hero">
-    <h1>Welcome to ChocoExpress</h1>
-    <p class="subtitle">Your premium chocolate shopping destination</p>
-    <ion-button expand="block" color="primary" (click)="goToCatalog()">
-      <ion-icon name="storefront-outline" slot="start"></ion-icon>
-      Browse Catalog
-    </ion-button>
-  </section>
-
-  <section class="quick-cats">
-    <button class="chip" *ngFor="let c of categories" (click)="goToCategory(c)">
-      {{ c }}
-    </button>
-  </section>
-
-  <section>
-    <h2 class="section-title">Featured</h2>
-    <ion-grid fixed>
-      <ion-row>
-        <ion-col size="6" sizeMd="4" sizeLg="3" *ngFor="let p of featured">
-          <ion-card class="product-card">
-            <ion-img
-              class="product-img"
-              [src]="p.img"
-              alt="{{ p.name }}"
-            ></ion-img>
-            <ion-card-header class="product-header">
-              <ion-card-title class="product-title"
-                >{{ p.name }}</ion-card-title
-              >
-            </ion-card-header>
-            <ion-card-content class="product-content">
-              <div class="price">₱ {{ p.price | number : '1.0-2' }}</div>
-              <ion-button
-                expand="block"
-                size="small"
-                class="add-btn"
-                (click)="addToCart(p)"
-                >Add to cart</ion-button
-              >
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </section>
-
-  <ion-toast
-    [isOpen]="toastOpen"
-    message="Added to cart"
-    duration="1200"
-    (ionToastDidDismiss)="toastOpen=false"
-  ></ion-toast>
+  <div class="center-wrap">
+    <section class="hero">
+      <div class="logo-wrap">
+        <img
+          src="assets/logo/splash.png"
+          alt="ChocoExpress logo"
+          class="brand-logo"
+        />
+      </div>
+      <h1>Welcome to ChocoExpress</h1>
+      <p class="subtitle">Your premium chocolate shopping destination</p>
+    </section>
+  </div>
 </ion-content>

@@ -16,16 +16,16 @@ async function run() {
   try {
     await conn.query(sql);
     // Insert default users with hashed passwords
-    const adminPass = await bcrypt.hash("admin123!", 10);
+    const adminPass = await bcrypt.hash("@Admin123", 10);
     const staffPass = await bcrypt.hash("staff123!", 10);
     const userPass = await bcrypt.hash("user123!", 10);
     await conn.changeUser({ database: config.MYSQL.database });
     await conn.query(
       "INSERT INTO users (name, username, email, password, role) VALUES (?,?,?,?,?),(?,?,?,?,?),(?,?,?,?,?)",
       [
-        "Admin One",
+        "Admin",
         "admin",
-        "admin@choco.local",
+        "admin@gmail.com",
         adminPass,
         "admin",
         "Staff One",

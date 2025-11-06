@@ -60,27 +60,14 @@ import { Router } from '@angular/router';
       </ng-template>
 
       <div class="summary ion-padding">
-        <ion-item lines="full">
-          <ion-label position="stacked">Promo code</ion-label>
-          <input
-            type="text"
-            placeholder="SWEET10 or FREESHIP"
-            [(ngModel)]="promo"
-            (keyup.enter)="applyPromo()"
-            style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--ion-color-step-200)"
-          />
-        </ion-item>
         <div class="row">
           <span>Subtotal</span>
           <strong>₱ {{ total$ | async | number : '1.0-2' }}</strong>
         </div>
-        <div class="row" *ngIf="discountValue > 0">
-          <span>Discount ({{ discountLabel }})</span>
-          <strong>- ₱ {{ discountValue | number : '1.0-2' }}</strong>
-        </div>
-        <div class="row total">
-          <span>Total</span>
-          <strong>₱ {{ grandTotal() | number : '1.0-2' }}</strong>
+        <div class="row note">
+          <ion-text color="medium"
+            >Have a promo code? Apply it on Checkout.</ion-text
+          >
         </div>
         <ion-button
           expand="block"
@@ -136,9 +123,7 @@ import { Router } from '@angular/router';
 export class CartPage {
   items$: Observable<CartItem[]> = this.cart.itemsObservable$;
   total$ = this.cart.total$;
-  promo = '';
-  discountLabel = '';
-  discountValue = 0;
+  // Promo moved to Checkout page
 
   toastOpen = false;
 
@@ -155,49 +140,10 @@ export class CartPage {
     this.cart.setQty(it.id, it.qty - 1);
   }
 
-  applyPromo() {
-    const code = this.promo.trim().toUpperCase();
-    // Simple mocked rules: SWEET10 => 10% off, FREESHIP => 50 off
-    this.discountLabel = '';
-    this.discountValue = 0;
-    const subtotal = this.cart
-      .getItemsSnapshot()
-      .reduce((s, i) => s + i.qty * i.price, 0);
-    if (subtotal <= 0) return;
-    if (code === 'SWEET10') {
-      this.discountLabel = 'SWEET10 (10%)';
-      this.discountValue = +(subtotal * 0.1).toFixed(2);
-    } else if (code === 'FREESHIP') {
-      this.discountLabel = 'FREESHIP (₱50)';
-      this.discountValue = Math.min(50, subtotal);
-    }
-  }
-
-  grandTotal() {
-    const subtotal = this.cart
-      .getItemsSnapshot()
-      .reduce((s, i) => s + i.qty * i.price, 0);
-    return Math.max(0, subtotal - this.discountValue);
-  }
+  // Totals handled on Checkout
 
   checkout() {
-    const items = this.cart
-      .getItemsSnapshot()
-      .map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.qty }));
-    const total = this.grandTotal();
-    if (!items.length || total <= 0) return;
-    this.api.createOrder({ items, total }).subscribe({
-      next: () => {
-        this.cart.clear();
-        this.toastOpen = true;
-        setTimeout(() => this.router.navigate(['/orders']), 600);
-      },
-      error: () => {
-        // fallback: still clear cart locally to simulate success
-        this.cart.clear();
-        this.toastOpen = true;
-        setTimeout(() => this.router.navigate(['/orders']), 600);
-      },
-    });
+    // Navigate to the new Checkout page for details & confirmation
+    this.router.navigate(['/checkout']);
   }
 }

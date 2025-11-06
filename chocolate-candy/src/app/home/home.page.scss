@@ -2,6 +2,25 @@
   text-align: center;
   margin-bottom: 16px;
 }
+.center-wrap {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 12px;
+  animation: floatY 6s ease-in-out infinite 1200ms;
+}
+.brand-logo {
+  width: clamp(96px, 20vw, 140px);
+  height: clamp(96px, 20vw, 140px);
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.18));
+  animation: logoEnter 700ms ease-out both;
+}
 .hero h1 {
   margin: 0 0 4px;
   font-size: 24px;
@@ -72,4 +91,34 @@ ion-button {
 .add-btn {
   margin-top: 8px;
   --border-radius: 10px;
+}
+
+@keyframes logoEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-wrap {
+    animation: none;
+  }
+  .brand-logo {
+    animation: none;
+  }
 }

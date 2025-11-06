@@ -12,6 +12,14 @@ const PORT = config.PORT;
 app.use(cors());
 app.use(express.json());
 
+// Crash visibility: surface unhandled errors during local dev
+process.on("unhandledRejection", (reason) => {
+  console.error("[unhandledRejection]", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException]", err);
+});
+
 // Friendly root message so visiting the backend URL doesn't show a 404
 app.get("/", (_req, res) => {
   res

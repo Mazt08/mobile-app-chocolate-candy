@@ -16,6 +16,7 @@ import {
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   standalone: true,
@@ -203,9 +204,7 @@ export class RegisterPage {
       if (status === 0) {
         alert(
           'Cannot reach API at ' +
-            (window as any).location?.origin
-              .replace(':8100', ':3000')
-              .replace(':5173', ':3000') +
+            environment.apiBase +
             '\nPlease start the backend or update environment.apiBase.'
         );
       } else {

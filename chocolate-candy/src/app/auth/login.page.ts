@@ -16,6 +16,7 @@ import {
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   standalone: true,
@@ -151,7 +152,9 @@ export class LoginPage {
       const status = e?.status ?? 0;
       if (status === 0) {
         alert(
-          'Cannot reach API. Please start the backend at http://localhost:3000 or update environment.apiBase.'
+          'Cannot reach API at ' +
+            environment.apiBase +
+            '\nPlease start the backend or update environment.apiBase.'
         );
       } else {
         alert(e?.error?.error || 'Login failed');

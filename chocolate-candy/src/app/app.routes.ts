@@ -44,6 +44,20 @@ export const routes: Routes = [
     canMatch: [authGuard],
   },
   {
+    path: 'checkout',
+    loadComponent: () =>
+      import('./pages/checkout/checkout.page').then((m) => m.CheckoutPage),
+    canMatch: [authGuard],
+  },
+  {
+    path: 'order-success/:id',
+    loadComponent: () =>
+      import('./pages/checkout/order-success.page').then(
+        (m) => m.OrderSuccessPage
+      ),
+    canMatch: [authGuard],
+  },
+  {
     path: 'notifications',
     loadComponent: () =>
       import('./placeholders/generic.page').then((m) =>
@@ -77,6 +91,13 @@ export const routes: Routes = [
       import('./pages/developers/developers.page').then(
         (m) => m.DevelopersPage
       ),
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./pages/admin/admin.page').then((m) => m.AdminPage),
+    canMatch: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
   },
   {
     path: 'admin/users',

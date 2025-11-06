@@ -1,86 +1,292 @@
 {
   "categories": [
     {
-      "name": "Dark"
+      "name": "Signature Chocolate Bars"
     },
     {
-      "name": "Milk"
+      "name": "Caramel Chocolate Creations"
     },
     {
-      "name": "Nuts"
+      "name": "Decadent Truffles"
     },
     {
-      "name": "Caramel"
+      "name": "Chocolate Covered Treats"
+    },
+    {
+      "name": "Gourmet Gift Boxes"
+    },
+    {
+      "name": "Seasonal Specialties"
     }
   ],
   "products": [
     {
-      "id": 1,
-      "name": "Dark Truffle",
-      "price": 129,
-      "category": "Dark",
-      "img": ""
+      "id": 1001,
+      "name": "Midnight Espresso Dark (85%)",
+      "description": "Intense dark chocolate with fine espresso beans.",
+      "price": 480,
+      "weight": "100g",
+      "category": "Signature Chocolate Bars",
+      "img": "assets/images/midnight-espresso.jpg"
     },
     {
-      "id": 2,
-      "name": "Milk Caramel",
-      "price": 99,
-      "category": "Milk",
-      "img": ""
+      "id": 1002,
+      "name": "Creamy Milk Chocolate Delight",
+      "description": "Velvety smooth 38% cocoa milk chocolate.",
+      "price": 420,
+      "weight": "100g",
+      "category": "Signature Chocolate Bars",
+      "img": "assets/images/creamy-milk.jpg"
     },
     {
-      "id": 3,
-      "name": "70% Cacao Bar",
-      "price": 149,
-      "category": "Dark",
-      "img": ""
+      "id": 1003,
+      "name": "Orange Zest Dark Chocolate (70%)",
+      "description": "Dark chocolate with crystallized orange peel.",
+      "price": 460,
+      "weight": "100g",
+      "category": "Signature Chocolate Bars",
+      "img": "assets/images/orange-zest.jpg"
     },
     {
-      "id": 4,
-      "name": "Hazelnut Praline",
-      "price": 141,
-      "category": "Nuts",
-      "img": ""
+      "id": 1004,
+      "name": "Pure Ivory White Chocolate",
+      "description": "Luxurious white chocolate with real vanilla.",
+      "price": 440,
+      "weight": "100g",
+      "category": "Signature Chocolate Bars",
+      "img": "assets/images/ivory-white.jpg"
     },
     {
-      "id": 5,
-      "name": "Almond Crunch",
-      "price": 129,
-      "category": "Nuts",
-      "img": ""
+      "id": 2001,
+      "name": "Salted Caramel Dark Bar",
+      "description": "Dark chocolate with a flowing river of salted caramel.",
+      "price": 540,
+      "weight": "85g",
+      "category": "Caramel Chocolate Creations",
+      "img": "assets/images/salt-caramel.jpg"
+    },
+    {
+      "id": 2002,
+      "name": "Caramel Crunch Milk Chocolate",
+      "description": "Milk chocolate with crispy caramelized bits.",
+      "price": 510,
+      "weight": "90g",
+      "category": "Caramel Chocolate Creations",
+      "img": "assets/images/caramel-crunch.jpg"
+    },
+    {
+      "id": 2003,
+      "name": "Double Caramel Swirl",
+      "description": "Marbled white and milk chocolate with caramel.",
+      "price": 570,
+      "weight": "95g",
+      "category": "Caramel Chocolate Creations",
+      "img": "assets/images/double-caramel.jpg"
+    },
+    {
+      "id": 2004,
+      "name": "Himalayan Salt Caramel Block",
+      "description": "Artisanal chocolate with caramel and pink salt.",
+      "price": 680,
+      "weight": "150g",
+      "category": "Caramel Chocolate Creations",
+      "img": "assets/images/himalayan-salt.jpg"
+    },
+    {
+      "id": 3001,
+      "name": "Salted Caramel Truffles",
+      "description": "Dark chocolate shells with liquid caramel centers.",
+      "price": 850,
+      "weight": "300g",
+      "category": "Decadent Truffles",
+      "img": "assets/images/caramel-truffle.jpg"
+    },
+    {
+      "id": 3002,
+      "name": "Caramel Macchiato Truffles",
+      "description": "Coffee-infused chocolate with espresso caramel.",
+      "price": 780,
+      "weight": "250g",
+      "category": "Decadent Truffles",
+      "img": "assets/images/caramel-macchiato.jpg"
+    },
+    {
+      "id": 3003,
+      "name": "Dark Chocolate Ganache Truffles",
+      "description": "Classic dark chocolate with velvety ganache.",
+      "price": 720,
+      "weight": "200g",
+      "category": "Decadent Truffles",
+      "img": "assets/images/dark-ganache.jpg"
+    },
+    {
+      "id": 3004,
+      "name": "Raspberry Rose Truffles",
+      "description": "White chocolate with raspberry and rose.",
+      "price": 750,
+      "weight": "220g",
+      "category": "Decadent Truffles",
+      "img": "assets/images/raspberry-rose.jpg"
+    },
+    {
+      "id": 4001,
+      "name": "Chocolate Covered Almonds",
+      "description": "Roasted almonds in dark chocolate.",
+      "price": 520,
+      "weight": "200g",
+      "category": "Chocolate Covered Treats",
+      "img": "assets/images/chocolate-covered-almonds.jpg"
+    },
+    {
+      "id": 4002,
+      "name": "Salted Caramel Pecan Clusters",
+      "description": "Caramel and pecans in dark chocolate.",
+      "price": 580,
+      "weight": "180g",
+      "category": "Chocolate Covered Treats",
+      "img": "assets/images/salted-caramel-pecan.jpg"
+    },
+    {
+      "id": 4003,
+      "name": "Milk Chocolate Honeycomb",
+      "description": "Airy honeycomb in creamy milk chocolate.",
+      "price": 490,
+      "weight": "150g",
+      "category": "Chocolate Covered Treats",
+      "img": "assets/images/milk-chocolate-honeycomb.jpg"
+    },
+    {
+      "id": 4004,
+      "name": "Chocolate Covered Coffee Beans",
+      "description": "Arabica beans in intense dark chocolate.",
+      "price": 450,
+      "weight": "120g",
+      "category": "Chocolate Covered Treats",
+      "img": "assets/images/chocolate-covered-coffee-beans.jpg"
+    },
+    {
+      "id": 5001,
+      "name": "The World Tour Collection",
+      "description": "5 single-origin dark chocolate bars.",
+      "price": 2100,
+      "weight": "425g",
+      "category": "Gourmet Gift Boxes",
+      "img": "assets/images/world-tour-collection.jpg"
+    },
+    {
+      "id": 5002,
+      "name": "Ultimate Caramel Lover's Box",
+      "description": "Assorted caramel chocolates and truffles.",
+      "price": 1850,
+      "weight": "500g",
+      "category": "Gourmet Gift Boxes",
+      "img": "assets/images/ultimate-caramel-lovers-box.jpg"
+    },
+    {
+      "id": 5003,
+      "name": "Truffle Taster's Premium Box",
+      "description": "16 gourmet truffles in 4 flavors.",
+      "price": 1600,
+      "weight": "400g",
+      "category": "Gourmet Gift Boxes",
+      "img": "assets/images/truffle-tasters-premium-box.jpg"
+    },
+    {
+      "id": 5004,
+      "name": "Create-Your-Own Chocolate Box",
+      "description": "Personalized selection of chocolates.",
+      "price": 1200,
+      "priceNote": "Starts at",
+      "weight": "300g",
+      "category": "Gourmet Gift Boxes",
+      "img": "assets/images/create-your-own-box.jpg"
+    },
+    {
+      "id": 6001,
+      "name": "Pumpkin Spice Caramel Bites",
+      "description": "White chocolate with spiced pumpkin caramel.",
+      "price": 650,
+      "weight": "150g",
+      "category": "Seasonal Specialties",
+      "img": "assets/images/pumpkin-spice-caramel.jpg"
+    },
+    {
+      "id": 6002,
+      "name": "Peppermint Bark",
+      "description": "Dark and white chocolate with candy canes.",
+      "price": 590,
+      "weight": "200g",
+      "category": "Seasonal Specialties",
+      "img": "assets/images/peppermint-bark.jpg"
+    },
+    {
+      "id": 6003,
+      "name": "Mango Caramel White Chocolate",
+      "description": "White chocolate with mango-caramel swirl.",
+      "price": 560,
+      "weight": "100g",
+      "category": "Seasonal Specialties",
+      "img": "assets/images/mango-caramel-white.jpg"
+    },
+    {
+      "id": 6004,
+      "name": "Easter Egg Hunt Kit",
+      "description": "Foil-wrapped chocolate eggs.",
+      "price": 880,
+      "weight": "300g",
+      "category": "Seasonal Specialties",
+      "img": "assets/images/easter-egg-hunt-kit.jpg"
+    },
+    {
+      "id": 6005,
+      "name": "Valentine's Heart Collection",
+      "description": "Heart-shaped chocolates and truffles.",
+      "price": 1250,
+      "weight": "350g",
+      "category": "Seasonal Specialties",
+      "img": "assets/images/valentines-heart-collection.jpg"
+    },
+    {
+      "id": 6006,
+      "name": "Spicy Maya Hot Chocolate Blocks",
+      "description": "Dark chocolate with cinnamon and chili for drinking.",
+      "price": 620,
+      "weight": "150g (3 blocks)",
+      "category": "Seasonal Specialties",
+      "img": "assets/images/spicy-maya-hot-chocolate.jpg"
     }
   ],
   "offers": [
     {
-      "title": "Buy 1 Get 1",
-      "subtitle": "Dark Truffle BOGO this week",
-      "badge": "New",
+      "title": "Signature Bestsellers",
+      "subtitle": "Top picks from our signature bars",
+      "badge": "Hot",
       "target": {
-        "category": "Dark"
+        "category": "Signature Chocolate Bars"
       }
     },
     {
-      "title": "15% Off",
-      "subtitle": "Orders over ₱500",
+      "title": "Caramel Lovers",
+      "subtitle": "Sweet caramel creations on promo",
+      "badge": "Yum",
+      "target": {
+        "category": "Caramel Chocolate Creations"
+      }
+    },
+    {
+      "title": "Truffle Treats",
+      "subtitle": "Save on decadent truffles",
       "badge": "Save",
       "target": {
         "sort": "priceAsc"
       }
     },
     {
-      "title": "Nutty Deals",
-      "subtitle": "Best picks with nuts",
-      "badge": "Yum",
+      "title": "Seasonal Highlights",
+      "subtitle": "Limited-time seasonal items",
+      "badge": "New",
       "target": {
-        "category": "Nuts"
-      }
-    },
-    {
-      "title": "Premium Picks",
-      "subtitle": "Top-rated treats",
-      "badge": "Hot",
-      "target": {
-        "sort": "popular"
+        "category": "Seasonal Specialties"
       }
     }
   ],
@@ -91,19 +297,19 @@
       "status": "Delivered",
       "items": [
         {
-          "id": 1,
-          "name": "Dark Truffle",
-          "price": 129,
-          "qty": 2
+          "id": 1001,
+          "name": "Midnight Espresso Dark (85%)",
+          "price": 480,
+          "qty": 1
         },
         {
-          "id": 4,
-          "name": "Hazelnut Praline",
-          "price": 141,
+          "id": 3003,
+          "name": "Dark Chocolate Ganache Truffles",
+          "price": 720,
           "qty": 1
         }
       ],
-      "total": 399
+      "total": 1200
     },
     {
       "id": 1025,
@@ -111,19 +317,19 @@
       "status": "Processing",
       "items": [
         {
-          "id": 2,
-          "name": "Milk Caramel",
-          "price": 99,
+          "id": 1002,
+          "name": "Creamy Milk Chocolate Delight",
+          "price": 420,
           "qty": 1
         },
         {
-          "id": 5,
-          "name": "Almond Crunch",
-          "price": 129,
+          "id": 4003,
+          "name": "Milk Chocolate Honeycomb",
+          "price": 490,
           "qty": 1
         }
       ],
-      "total": 228
+      "total": 910
     }
   ],
   "developers": [
@@ -142,6 +348,32 @@
       "name": "Railey Modrigo",
       "role": "No Roles",
       "img": ""
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin",
+      "username": "admin",
+      "email": "admin@gmail.com",
+      "password": "@Admin123",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "name": "Staff One",
+      "username": "staff",
+      "email": "staff@choco.local",
+      "password": "staff123!",
+      "role": "staff"
+    },
+    {
+      "id": 3,
+      "name": "Sample User",
+      "username": "user",
+      "email": "user@choco.local",
+      "password": "user123!",
+      "role": "user"
     }
   ]
 }

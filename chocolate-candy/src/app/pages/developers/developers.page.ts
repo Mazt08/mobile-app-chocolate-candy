@@ -104,7 +104,7 @@ export class DevelopersPage {
   defaultImg = 'assets/icon/favicon.png';
   devs = [
     {
-      name: 'John Reex O. Aspiras',
+      name: 'John Rex O. Aspiras',
       role: 'Fullstack Developer',
       github: 'https://github.com/Mazt08',
       img: 'https://github.com/Mazt08.png',

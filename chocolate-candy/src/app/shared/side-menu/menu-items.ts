@@ -92,6 +92,13 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
     label: 'Admin',
     items: [
       {
+        title: 'Dashboard',
+        route: '/admin',
+        icon: 'speedometer-outline',
+        visibleFor: 'user',
+        visibleForRole: ['admin'],
+      },
+      {
         title: 'Users',
         route: '/admin/users',
         icon: 'people-outline',

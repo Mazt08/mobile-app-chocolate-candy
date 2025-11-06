@@ -319,10 +319,10 @@ function run() {
   db.users = [
     {
       id: 1,
-      name: "Admin One",
+      name: "Admin",
       username: "admin",
-      email: "admin@choco.local",
-      password: "admin123!",
+      email: "admin@gmail.com",
+      password: "@Admin123",
       role: "admin",
     },
     {
