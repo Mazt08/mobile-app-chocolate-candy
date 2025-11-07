@@ -19,6 +19,7 @@ import {
 } from '@ionic/angular/standalone';
 import { CartService } from '../../cart/cart.service';
 import { ApiService } from '../../services/api.service';
+import { Router } from '@angular/router';
 
 // Minimal shape for an order coming from the API
 interface OrderItem {
@@ -156,7 +157,11 @@ export class OrdersPage {
     },
   ];
 
-  constructor(private cart: CartService, private api: ApiService) {
+  constructor(
+    private cart: CartService,
+    private api: ApiService,
+    private router: Router
+  ) {
     this.api.getOrders().subscribe({
       next: (arr) => {
         if (Array.isArray(arr) && arr.length) this.orders = arr as Order[];
@@ -175,7 +180,8 @@ export class OrdersPage {
   }
 
   toggle(o: any) {
-    o.expanded = !o.expanded;
+    // Navigate to detail view
+    this.router.navigate(['/orders', o.id]);
   }
 
   reorder(o: any) {

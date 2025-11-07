@@ -96,6 +96,67 @@ app.post("/api/orders", authRequired, loadUser, async (req, res) => {
   }
 });
 
+// User: get a single order they own
+app.get("/api/orders/:id", authRequired, loadUser, async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!db.getOrderById)
+      return res.status(501).json({ error: "Driver missing getOrderById" });
+    const order = await Promise.resolve(db.getOrderById(id));
+    if (!order) return res.status(404).json({ error: "Not found" });
+    if (order.user && order.user.id && order.user.id !== req.user.id) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    res.json(order);
+  } catch (e) {
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// Admin: list all orders regardless of user
+app.get(
+  "/api/admin/orders",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (_req, res) => {
+    try {
+      const data = await Promise.resolve(db.getOrders({}));
+      res.json(data);
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  }
+);
+
+// Admin: update order status
+app.patch(
+  "/api/admin/orders/:id/status",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { status } = req.body || {};
+      const VALID = ["Processing", "Pending", "Delivered"];
+      if (!VALID.includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+      if (!db.updateOrderStatus) {
+        return res
+          .status(501)
+          .json({ error: "Driver does not support status updates" });
+      }
+      const updated = await Promise.resolve(db.updateOrderStatus(id, status));
+      if (!updated) return res.status(404).json({ error: "Order not found" });
+      res.json(updated);
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  }
+);
+
 app.post("/api/register", async (req, res) => {
   try {
     const { name, username, email, password, role } = req.body || {};
@@ -169,6 +230,25 @@ app.get(
     try {
       const users = await Promise.resolve(db.listUsers());
       res.json(users);
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  }
+);
+
+// Admin: get single order by id
+app.get(
+  "/api/admin/orders/:id",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (req, res) => {
+    try {
+      if (!db.getOrderById)
+        return res.status(501).json({ error: "Driver missing getOrderById" });
+      const order = await Promise.resolve(db.getOrderById(req.params.id));
+      if (!order) return res.status(404).json({ error: "Not found" });
+      res.json(order);
     } catch (e) {
       res.status(500).json({ error: String(e.message || e) });
     }

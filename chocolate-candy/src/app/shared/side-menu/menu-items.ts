@@ -105,6 +105,13 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
         visibleFor: 'user',
         visibleForRole: ['admin'],
       },
+      {
+        title: 'All Orders',
+        route: '/admin/orders',
+        icon: 'receipt-outline',
+        visibleFor: 'user',
+        visibleForRole: ['admin'],
+      },
     ],
   },
 ];

@@ -116,7 +116,7 @@ export class DevelopersPage {
     },
     {
       name: 'Railey Modrigo',
-      role: 'No Roles',
+      role: 'No Role',
       img: '',
     },
   ];

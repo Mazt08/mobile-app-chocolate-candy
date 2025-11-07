@@ -14,6 +14,16 @@ function getPool() {
       waitForConnections: true,
       connectionLimit: 10,
     });
+    // Ensure auxiliary table for order metadata exists (idempotent)
+    (async () => {
+      try {
+        await pool.query(
+          "CREATE TABLE IF NOT EXISTS order_meta (order_id INT PRIMARY KEY, meta TEXT, CONSTRAINT fk_meta_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE)"
+        );
+      } catch (e) {
+        console.warn("[DB] order_meta ensure failed:", e?.message || e);
+      }
+    })();
   }
   return pool;
 }
@@ -85,6 +95,20 @@ async function getOrders(opts) {
       .join(",")})`,
     ids
   );
+  const [metas] = await getPool().query(
+    `SELECT order_id, meta FROM order_meta WHERE order_id IN (${ids
+      .map(() => "?")
+      .join(",")})`,
+    ids
+  );
+  const metaMap = new Map();
+  for (const m of metas) {
+    try {
+      metaMap.set(m.order_id, JSON.parse(m.meta));
+    } catch {
+      metaMap.set(m.order_id, null);
+    }
+  }
   const byOrder = new Map();
   for (const o of orders) {
     const base = {
@@ -93,6 +117,7 @@ async function getOrders(opts) {
       status: o.status,
       total: o.total,
       items: [],
+      meta: metaMap.get(o.id) || undefined,
     };
     if (o.user_id)
       base["user"] = { id: o.user_id, name: o.user_name, email: o.user_email };
@@ -145,6 +170,22 @@ async function createOrder(payload) {
         [items]
       );
     }
+    const meta = {
+      promo: payload?.meta?.promo || "",
+      discountLabel: payload?.meta?.discountLabel || "",
+      payment: payload?.meta?.payment || "cod",
+      contact: {
+        name: payload?.meta?.contact?.name || "",
+        phone: payload?.meta?.contact?.phone || "",
+        address: payload?.meta?.contact?.address || "",
+        city: payload?.meta?.contact?.city || "",
+        notes: payload?.meta?.contact?.notes || "",
+      },
+    };
+    await conn.query("INSERT INTO order_meta (order_id, meta) VALUES (?, ?)", [
+      id,
+      JSON.stringify(meta),
+    ]);
     await conn.commit();
     return {
       id,
@@ -157,6 +198,7 @@ async function createOrder(payload) {
         price: Number(i.price),
         qty: Number(i.qty),
       })),
+      meta,
     };
   } catch (e) {
     await conn.rollback();
@@ -173,6 +215,98 @@ module.exports = {
   getOrders,
   getDevelopers,
   createOrder,
+  async updateOrderStatus(id, status) {
+    await getPool().query("UPDATE orders SET status = ? WHERE id = ?", [
+      status,
+      id,
+    ]);
+    const [rows] = await getPool().query(
+      "SELECT id, date, status, total, user_id FROM orders WHERE id = ?",
+      [id]
+    );
+    if (!rows[0]) return null;
+    const order = rows[0];
+    const [items] = await getPool().query(
+      "SELECT product_id AS id, name, price, qty FROM order_items WHERE order_id = ?",
+      [id]
+    );
+    const [metas] = await getPool().query(
+      "SELECT meta FROM order_meta WHERE order_id = ?",
+      [id]
+    );
+    let meta;
+    if (metas[0]?.meta) {
+      try {
+        meta = JSON.parse(metas[0].meta);
+      } catch {}
+    }
+    let user;
+    if (order.user_id) {
+      const [u] = await getPool().query(
+        "SELECT id, name, email, role FROM users WHERE id = ?",
+        [order.user_id]
+      );
+      user = u[0] ? u[0] : undefined;
+    }
+    return {
+      id: order.id,
+      date: order.date,
+      status: order.status,
+      total: order.total,
+      items: items.map((it) => ({
+        id: it.id,
+        name: it.name,
+        price: it.price,
+        qty: it.qty,
+      })),
+      ...(meta ? { meta } : {}),
+      ...(user ? { user } : {}),
+    };
+  },
+  async getOrderById(id) {
+    const [orders] = await getPool().query(
+      "SELECT id, date, status, total, user_id FROM orders WHERE id = ?",
+      [id]
+    );
+    if (!orders[0]) return null;
+    const order = orders[0];
+    const [items] = await getPool().query(
+      "SELECT product_id AS id, name, price, qty FROM order_items WHERE order_id = ?",
+      [id]
+    );
+    const [metas] = await getPool().query(
+      "SELECT meta FROM order_meta WHERE order_id = ?",
+      [id]
+    );
+    let meta;
+    if (metas[0]?.meta) {
+      try {
+        meta = JSON.parse(metas[0].meta);
+      } catch {}
+    }
+    let user;
+    if (order.user_id) {
+      const [u] = await getPool().query(
+        "SELECT id, name, email, role FROM users WHERE id = ?",
+        [order.user_id]
+      );
+      user = u[0] ? u[0] : undefined;
+    }
+    return {
+      id: order.id,
+      date: order.date,
+      status: order.status,
+      total: order.total,
+      items: items.map((it) => ({
+        id: it.id,
+        name: it.name,
+        price: it.price,
+        qty: it.qty,
+      })),
+      ...(meta ? { meta } : {}),
+      ...(user ? { user } : {}),
+    };
+  },
   // Users API (used by server routes)
   async findUserByEmailOrUsername(identity) {
     const [rows] = await getPool().query(

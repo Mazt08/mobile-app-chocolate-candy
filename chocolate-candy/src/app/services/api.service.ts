@@ -24,6 +24,9 @@ export class ApiService {
   getOrders() {
     return this.http.get<any[]>(`${this.base}/orders`);
   }
+  getOrder(id: number) {
+    return this.http.get<any>(`${this.base}/orders/${id}`);
+  }
 
   getDevelopers() {
     return this.http.get<any[]>(`${this.base}/developers`);
@@ -64,5 +67,22 @@ export class ApiService {
   // Admin
   getAdminUsers() {
     return this.http.get<any[]>(`${this.base}/admin/users`);
+  }
+  getAdminOrder(id: number) {
+    return this.http.get<any>(`${this.base}/admin/orders/${id}`);
+  }
+
+  // Admin Orders
+  getAdminOrders() {
+    return this.http.get<any[]>(`${this.base}/admin/orders`);
+  }
+
+  updateOrderStatus(
+    id: number,
+    status: 'Processing' | 'Pending' | 'Delivered'
+  ) {
+    return this.http.patch<any>(`${this.base}/admin/orders/${id}/status`, {
+      status,
+    });
   }
 }

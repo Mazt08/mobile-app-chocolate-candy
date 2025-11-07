@@ -46,6 +46,16 @@ module.exports = {
   getDevelopers() {
     return load().developers;
   },
+  updateOrderStatus(id, status) {
+    const db = load();
+    const orders = db.orders || [];
+    const idx = orders.findIndex((o) => o.id === Number(id));
+    if (idx === -1) return null;
+    orders[idx] = { ...orders[idx], status };
+    db.orders = orders;
+    save(db);
+    return orders[idx];
+  },
   findUserByEmailOrUsername(identity) {
     const db = load();
     return (db.users || []).find(
@@ -97,6 +107,18 @@ module.exports = {
         price: Number(i.price),
         qty: Number(i.qty),
       })),
+      meta: {
+        promo: payload?.meta?.promo || "",
+        discountLabel: payload?.meta?.discountLabel || "",
+        payment: payload?.meta?.payment || "cod",
+        contact: {
+          name: payload?.meta?.contact?.name || "",
+          phone: payload?.meta?.contact?.phone || "",
+          address: payload?.meta?.contact?.address || "",
+          city: payload?.meta?.contact?.city || "",
+          notes: payload?.meta?.contact?.notes || "",
+        },
+      },
     };
     // Attach minimal user info when available
     if (payload?.userId) {
@@ -117,5 +139,9 @@ module.exports = {
     db.orders = [order, ...(db.orders || [])];
     save(db);
     return order;
+  },
+  getOrderById(id) {
+    const db = load();
+    return (db.orders || []).find((o) => o.id === Number(id)) || null;
   },
 };

@@ -44,6 +44,12 @@ export const routes: Routes = [
     canMatch: [authGuard],
   },
   {
+    path: 'orders/:id',
+    loadComponent: () =>
+      import('./pages/orders/order-detail.page').then((m) => m.OrderDetailPage),
+    canMatch: [authGuard],
+  },
+  {
     path: 'checkout',
     loadComponent: () =>
       import('./pages/checkout/checkout.page').then((m) => m.CheckoutPage),
@@ -103,6 +109,22 @@ export const routes: Routes = [
     path: 'admin/users',
     loadComponent: () =>
       import('./pages/admin/users.page').then((m) => m.AdminUsersPage),
+    canMatch: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
+  },
+  {
+    path: 'admin/orders',
+    loadComponent: () =>
+      import('./pages/admin/orders.page').then((m) => m.AdminOrdersPage),
+    canMatch: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
+  },
+  {
+    path: 'admin/orders/:id',
+    loadComponent: () =>
+      import('./pages/admin/order-detail.page').then(
+        (m) => m.AdminOrderDetailPage
+      ),
     canMatch: [authGuard, roleGuard],
     data: { roles: ['admin'] },
   },
