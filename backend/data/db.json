@@ -382,6 +382,22 @@
       "email": "promazt@gmail.com",
       "password": "@Promazt2020",
       "role": "user"
+    },
+    {
+      "id": 5,
+      "name": "Rex nanaman",
+      "username": "Pres",
+      "email": "asdasd@gmail.com",
+      "password": "@Promazt2020",
+      "role": "user"
+    },
+    {
+      "id": 6,
+      "name": "asd",
+      "username": "asd",
+      "email": "asd@gmail.com",
+      "password": "@Qweasdrf123",
+      "role": "user"
     }
   ]
 }
