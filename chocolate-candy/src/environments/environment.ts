@@ -5,6 +5,8 @@
 export const environment = {
   production: false,
   apiBase: '/api',
+  // Optional: set a primary APK URL (e.g., CDN or specific file path)
+  apkUrl: '/uploads/app.apk',
 };
 
 /*

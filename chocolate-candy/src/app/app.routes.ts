@@ -121,6 +121,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'downloads',
+    loadComponent: () =>
+      import('./pages/downloads/downloads.page').then((m) => m.DownloadsPage),
+  },
+  {
     path: 'product/:id',
     loadComponent: () =>
       import('./pages/product/product-detail.page').then(

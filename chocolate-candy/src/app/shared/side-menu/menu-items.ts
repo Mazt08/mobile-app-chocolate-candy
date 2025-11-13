@@ -89,6 +89,11 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
         visibleFor: 'user',
       },
       {
+        title: 'Download App',
+        route: '/downloads',
+        icon: 'download-outline',
+      },
+      {
         title: 'About the App',
         route: '/about',
         icon: 'information-circle-outline',
