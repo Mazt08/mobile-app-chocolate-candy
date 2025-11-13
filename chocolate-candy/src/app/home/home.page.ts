@@ -7,17 +7,6 @@ import {
   IonContent,
   IonButtons,
   IonMenuButton,
-  IonButton,
-  IonIcon,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonImg,
-  IonToast,
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { CartService } from '../cart/cart.service';
@@ -34,17 +23,6 @@ import { CartService } from '../cart/cart.service';
     IonContent,
     IonButtons,
     IonMenuButton,
-    IonButton,
-    IonIcon,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonImg,
-    IonToast,
   ],
 })
 export class HomePage {

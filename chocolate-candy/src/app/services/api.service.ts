@@ -85,4 +85,18 @@ export class ApiService {
       status,
     });
   }
+
+  // Admin Products CRUD
+  getAdminProducts() {
+    return this.http.get<any[]>(`${this.base}/admin/products`);
+  }
+  createAdminProduct(payload: any) {
+    return this.http.post<any>(`${this.base}/admin/products`, payload);
+  }
+  updateAdminProduct(id: number, payload: any) {
+    return this.http.patch<any>(`${this.base}/admin/products/${id}`, payload);
+  }
+  deleteAdminProduct(id: number) {
+    return this.http.delete<void>(`${this.base}/admin/products/${id}`);
+  }
 }

@@ -57,6 +57,108 @@ async function getProducts(query = {}) {
   return rows;
 }
 
+async function ensureCategoryId(name) {
+  if (!name) {
+    // default to first category if none provided
+    const [rows] = await getPool().query(
+      "SELECT id FROM categories ORDER BY id LIMIT 1"
+    );
+    return rows[0]?.id || null;
+  }
+  const [found] = await getPool().query(
+    "SELECT id FROM categories WHERE name = ? LIMIT 1",
+    [name]
+  );
+  if (found[0]?.id) return found[0].id;
+  const [res] = await getPool().query(
+    "INSERT INTO categories (name) VALUES (?)",
+    [name]
+  );
+  return res.insertId;
+}
+
+async function createProduct(prod) {
+  const categoryId = await ensureCategoryId(
+    String(prod?.category || "").trim()
+  );
+  const name = String(prod?.name || "").trim();
+  const description = String(prod?.description || "");
+  const price = Number(prod?.price || 0);
+  const weight = prod?.weight ?? "100g";
+  const img = String(prod?.img || "");
+  const [res] = await getPool().query(
+    "INSERT INTO products (name, description, price, weight, img, category_id) VALUES (?,?,?,?,?,?)",
+    [name, description, price, weight, img, categoryId]
+  );
+  const id = res.insertId;
+  return {
+    id,
+    name,
+    description,
+    price,
+    weight,
+    img,
+    category: String(prod?.category || ""),
+  };
+}
+
+async function updateProduct(id, patch) {
+  const fields = [];
+  const params = [];
+  if (patch?.name !== undefined) {
+    fields.push("name = ?");
+    params.push(String(patch.name));
+  }
+  if (patch?.description !== undefined) {
+    fields.push("description = ?");
+    params.push(String(patch.description));
+  }
+  if (patch?.price !== undefined) {
+    fields.push("price = ?");
+    params.push(Number(patch.price));
+  }
+  if (patch?.weight !== undefined) {
+    fields.push("weight = ?");
+    params.push(patch.weight);
+  }
+  if (patch?.img !== undefined) {
+    fields.push("img = ?");
+    params.push(String(patch.img));
+  }
+  if (patch?.category !== undefined) {
+    const catId = await ensureCategoryId(String(patch.category));
+    fields.push("category_id = ?");
+    params.push(catId);
+  }
+  if (!fields.length) {
+    // nothing to update, return current row
+    const [rows] = await getPool().query(
+      `SELECT p.id, p.name, p.description, p.price, p.weight, p.img, c.name AS category
+       FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = ?`,
+      [id]
+    );
+    return rows[0] || null;
+  }
+  params.push(id);
+  await getPool().query(
+    `UPDATE products SET ${fields.join(", ")} WHERE id = ?`,
+    params
+  );
+  const [rows] = await getPool().query(
+    `SELECT p.id, p.name, p.description, p.price, p.weight, p.img, c.name AS category
+     FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = ?`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+async function deleteProduct(id) {
+  const [res] = await getPool().query("DELETE FROM products WHERE id = ?", [
+    id,
+  ]);
+  return res.affectedRows > 0;
+}
+
 async function getOffers() {
   const [rows] = await getPool().query(
     "SELECT title, subtitle, badge, target_sort AS sort, target_category AS category FROM offers"
@@ -215,6 +317,9 @@ module.exports = {
   getOrders,
   getDevelopers,
   createOrder,
+  createProduct,
+  updateProduct,
+  deleteProduct,
   async updateOrderStatus(id, status) {
     await getPool().query("UPDATE orders SET status = ? WHERE id = ?", [
       status,

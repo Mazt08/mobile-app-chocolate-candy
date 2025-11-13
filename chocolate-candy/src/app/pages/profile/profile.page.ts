@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -15,6 +15,7 @@ import {
   IonText,
   IonInput,
   IonButton,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../auth/auth.service';
 
@@ -32,12 +33,38 @@ import { AuthService } from '../../auth/auth.service';
     </ion-header>
     <ion-content>
       <div class="ion-padding" *ngIf="user as u">
-        <ion-avatar style="width:72px;height:72px;"
-          ><img [src]="u.avatar || 'assets/icon/user-avatar.svg'" alt="avatar"
-        /></ion-avatar>
+        <div class="avatar-row">
+          <ion-avatar
+            style="width:72px;height:72px;"
+            class="clickable-avatar"
+            (click)="onPickAvatarClick()"
+            title="Change avatar"
+          >
+            <img
+              [src]="u.avatar || 'assets/icon/user-avatar.svg'"
+              alt="avatar"
+            />
+          </ion-avatar>
+          <ion-button
+            fill="clear"
+            size="small"
+            class="change-link"
+            (click)="onPickAvatarClick()"
+          >
+            <ion-icon name="camera-outline" slot="start"></ion-icon>
+            Change image
+          </ion-button>
+        </div>
+        <!-- hidden file input for selecting avatar -->
+        <input
+          #fileInput
+          type="file"
+          accept="image/*"
+          style="display:none"
+          (change)="onFileSelected($event)"
+        />
         <h2 class="ion-padding-top">{{ u.name }}</h2>
         <ion-text color="medium">{{ u.email }}</ion-text>
-        <div *ngIf="u.role" class="role-pill">Role: {{ u.role }}</div>
       </div>
       <ion-list>
         <ion-item>
@@ -51,10 +78,6 @@ import { AuthService } from '../../auth/auth.service';
         <ion-item>
           <ion-label position="stacked">Username</ion-label>
           <ion-input [(ngModel)]="edit.username"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">Avatar URL</ion-label>
-          <ion-input [(ngModel)]="edit.avatar"></ion-input>
         </ion-item>
         <ion-item lines="none">
           <ion-button expand="block" (click)="save()">Save</ion-button>
@@ -72,14 +95,24 @@ import { AuthService } from '../../auth/auth.service';
       h2 {
         margin: 8px 0 0;
       }
-      .role-pill {
-        margin-top: 4px;
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 12px;
-        background: var(--ion-color-light);
-        color: var(--ion-color-medium-contrast, #333);
-        font-size: 12px;
+
+      .clickable-avatar {
+        cursor: pointer;
+      }
+      .clickable-avatar::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+      }
+      .avatar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .change-link {
+        color: var(--ion-color-secondary);
+        font-weight: 600;
       }
     `,
   ],
@@ -99,6 +132,7 @@ import { AuthService } from '../../auth/auth.service';
     IonText,
     IonInput,
     IonButton,
+    IonIcon,
   ],
 })
 export class ProfilePage {
@@ -108,20 +142,37 @@ export class ProfilePage {
     username: this.user?.username || '',
     avatar: this.user?.avatar || '',
   };
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
   constructor(private auth: AuthService) {}
+
+  onPickAvatarClick() {
+    this.fileInput?.nativeElement.click();
+  }
+
+  onFileSelected(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input?.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      this.edit.avatar = dataUrl; // store as data URL
+      // Update via AuthService so other subscribers (e.g., side menu) refresh
+      this.auth.updateUser({ avatar: dataUrl });
+      this.user = this.auth.user; // refresh local reference
+    };
+    reader.readAsDataURL(file);
+  }
 
   save() {
     const u = this.auth.user;
     if (!u) return;
-    const next = {
-      ...u,
+    this.auth.updateUser({
       name: this.edit.name,
       username: this.edit.username,
       avatar: this.edit.avatar,
-    };
-    localStorage.setItem('chocoexpressUser', JSON.stringify(next));
-    // naive in-place update (since AuthService reads from storage on reload, we also update live ref)
-    (this as any).user = next;
+    });
+    this.user = this.auth.user;
   }
 
   logout() {

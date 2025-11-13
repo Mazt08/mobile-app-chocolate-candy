@@ -374,6 +374,14 @@
       "email": "user@choco.local",
       "password": "user123!",
       "role": "user"
+    },
+    {
+      "id": 4,
+      "name": "Rex Aspiras",
+      "username": "Promazt",
+      "email": "promazt@gmail.com",
+      "password": "@Promazt2020",
+      "role": "user"
     }
   ]
 }

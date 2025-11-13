@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "build": "npm ci --prefix chocolate-candy && npm run build --prefix chocolate-candy",
-    "start": "npx serve -s chocolate-candy/www -l $PORT"
+    "start": "npx serve -s chocolate-candy/www -l $PORT",
+    "backend": "npm run start --prefix backend",
+    "frontend": "npm run start --prefix chocolate-candy",
+    "dev": "concurrently --handle-input -n BE,FE -c blue,green \"npm:backend\" \"npm:frontend\""
   },
   "dependencies": {
     "@angular/animations": "^18.0.0",
@@ -26,7 +29,8 @@
     "@angular/compiler": "^18.0.0",
     "@angular/compiler-cli": "^18.0.0",
     "@ionic/cli": "^7.0.0",
-    "typescript": "~5.4.0"
+    "typescript": "~5.4.0",
+    "concurrently": "^8.2.2"
   },
   "engines": {
     "node": "20.x"

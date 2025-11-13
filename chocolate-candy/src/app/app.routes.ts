@@ -99,6 +99,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'product/:id',
+    loadComponent: () =>
+      import('./pages/product/product-detail.page').then(
+        (m) => m.ProductDetailPage
+      ),
+  },
+  {
     path: 'admin',
     loadComponent: () =>
       import('./pages/admin/admin.page').then((m) => m.AdminPage),
@@ -120,6 +127,24 @@ export const routes: Routes = [
     data: { roles: ['admin'] },
   },
   {
+    path: 'admin/products',
+    loadComponent: () =>
+      import('src/app/pages/admin/products.page').then(
+        (m) => m.AdminProductsPage
+      ),
+    canMatch: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
+  },
+  {
+    path: 'admin/reports',
+    loadComponent: () =>
+      import('src/app/pages/admin/reports.page').then(
+        (m) => m.AdminReportsPage
+      ),
+    canMatch: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
+  },
+  {
     path: 'admin/orders/:id',
     loadComponent: () =>
       import('./pages/admin/order-detail.page').then(
@@ -129,17 +154,22 @@ export const routes: Routes = [
     data: { roles: ['admin'] },
   },
   {
+    path: 'auth',
+    loadComponent: () => import('./auth/auth.page').then((m) => m.AuthPage),
+  },
+  {
     path: 'login',
-    loadComponent: () => import('./auth/login.page').then((m) => m.LoginPage),
+    redirectTo: 'auth',
+    pathMatch: 'full',
   },
   {
     path: 'register',
-    loadComponent: () =>
-      import('./auth/register.page').then((m) => m.RegisterPage),
+    redirectTo: 'auth',
+    pathMatch: 'full',
   },
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'auth',
     pathMatch: 'full',
   },
 ];

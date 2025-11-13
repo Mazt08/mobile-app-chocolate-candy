@@ -34,6 +34,14 @@ export class AuthService {
     return this._user$.value;
   }
 
+  updateUser(patch: Partial<AuthUser>) {
+    const curr = this._user$.value;
+    if (!curr) return;
+    const next = { ...curr, ...patch } as AuthUser;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    this._user$.next(next);
+  }
+
   async login(identity: string, password: string) {
     // Calls backend to validate credentials; identity can be email or username
     const res = await firstValueFrom(this.api.login(identity, password));

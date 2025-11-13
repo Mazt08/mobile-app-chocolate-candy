@@ -44,15 +44,9 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
     items: [
       // Guest-only actions
       {
-        title: 'Login',
-        route: '/login',
+        title: 'Login / Sign Up',
+        route: '/auth',
         icon: 'log-in-outline',
-        visibleFor: 'guest',
-      },
-      {
-        title: 'Register',
-        route: '/register',
-        icon: 'person-add-outline',
         visibleFor: 'guest',
       },
       // User-only actions

@@ -102,10 +102,6 @@ import { environment } from '../../environments/environment';
           I already have an account
         </ion-button>
       </form>
-
-      <div class="tip">
-        <ion-text color="medium">Demo: simple validation only.</ion-text>
-      </div>
     </ion-content>
   `,
   styles: [
@@ -215,6 +211,6 @@ export class RegisterPage {
   }
 
   goLogin() {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth']);
   }
 }

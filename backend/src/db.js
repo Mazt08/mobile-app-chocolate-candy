@@ -32,6 +32,55 @@ module.exports = {
   getProducts() {
     return load().products;
   },
+  createProduct(prod) {
+    const db = load();
+    const nextId =
+      (db.products?.reduce((m, p) => Math.max(m, p.id || 0), 0) || 0) + 1;
+    const item = {
+      id: nextId,
+      name: String(prod?.name || "").trim(),
+      description: String(prod?.description || ""),
+      price: Number(prod?.price || 0),
+      weight: prod?.weight ?? "",
+      img: String(prod?.img || ""),
+      category: String(prod?.category || ""),
+    };
+    db.products = [...(db.products || []), item];
+    save(db);
+    return item;
+  },
+  updateProduct(id, patch) {
+    const db = load();
+    const idx = (db.products || []).findIndex((p) => p.id === Number(id));
+    if (idx === -1) return null;
+    const prev = db.products[idx];
+    const next = {
+      ...prev,
+      ...(patch?.name !== undefined ? { name: String(patch.name) } : {}),
+      ...(patch?.description !== undefined
+        ? { description: String(patch.description) }
+        : {}),
+      ...(patch?.price !== undefined ? { price: Number(patch.price) } : {}),
+      ...(patch?.weight !== undefined ? { weight: patch.weight } : {}),
+      ...(patch?.img !== undefined ? { img: String(patch.img) } : {}),
+      ...(patch?.category !== undefined
+        ? { category: String(patch.category) }
+        : {}),
+    };
+    db.products[idx] = next;
+    save(db);
+    return next;
+  },
+  deleteProduct(id) {
+    const db = load();
+    const before = db.products || [];
+    const idx = before.findIndex((p) => p.id === Number(id));
+    if (idx === -1) return false;
+    before.splice(idx, 1);
+    db.products = before;
+    save(db);
+    return true;
+  },
   getOffers() {
     return load().offers;
   },

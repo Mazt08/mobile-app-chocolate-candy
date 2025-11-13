@@ -72,10 +72,6 @@ import { environment } from '../../environments/environment';
           Create an account
         </ion-button>
       </form>
-
-      <div class="tip">
-        <ion-text color="medium">Demo: any email/password works.</ion-text>
-      </div>
     </ion-content>
   `,
   styles: [
@@ -163,6 +159,6 @@ export class LoginPage {
   }
 
   goRegister() {
-    this.router.navigate(['/register']);
+    this.router.navigate(['/auth']);
   }
 }

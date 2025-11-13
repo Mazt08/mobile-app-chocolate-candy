@@ -132,7 +132,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     if (this.user.isLoggedIn) {
       this.router.navigate(['/profile']);
     } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth']);
     }
   }
 
@@ -152,8 +152,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
   }
 
   private loadUserData() {
-    // This would typically load from a user service or storage
-    // For demo purposes, we'll use mock data
+    // Load from local storage if available
     const savedUser = localStorage.getItem('chocoexpressUser');
     if (savedUser) {
       this.user = JSON.parse(savedUser);
@@ -197,6 +196,47 @@ export class SideMenuComponent implements OnInit, OnDestroy {
   private filterSectionsByVisibility(sections: MenuSection[]): MenuSection[] {
     const isLoggedIn = !!this.user?.isLoggedIn;
     const role = this.user?.role as 'admin' | 'staff' | 'user' | undefined;
+    // If admin, show only the required admin items
+    if (isLoggedIn && role === 'admin') {
+      const adminOnly: MenuSection[] = [
+        {
+          label: 'Admin',
+          items: [
+            {
+              title: 'Dashboard',
+              route: '/admin',
+              icon: 'speedometer-outline',
+            },
+            {
+              title: 'User Management',
+              route: '/admin/users',
+              icon: 'people-outline',
+            },
+            {
+              title: 'Reports',
+              route: '/admin/reports',
+              icon: 'bar-chart-outline',
+            },
+            {
+              title: 'Orders',
+              route: '/admin/orders',
+              icon: 'receipt-outline',
+            },
+            {
+              title: 'Products',
+              route: '/admin/products',
+              icon: 'cube-outline',
+            },
+            {
+              title: 'Sign Out',
+              route: 'logout',
+              icon: 'log-out-outline',
+            },
+          ],
+        },
+      ];
+      return adminOnly;
+    }
     return sections.map((section) => ({
       label: section.label,
       items: section.items.filter((item) => {

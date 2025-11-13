@@ -22,7 +22,6 @@ import {
   IonListHeader,
   IonToast,
 } from '@ionic/angular/standalone';
-import { AsyncPipe } from '@angular/common';
 import { CartService } from '../../cart/cart.service';
 import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
@@ -205,7 +204,6 @@ import { environment } from '../../../environments/environment';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    AsyncPipe,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -220,7 +218,7 @@ import { environment } from '../../../environments/environment';
     IonTextarea,
     IonText,
     IonButton,
-    IonIcon,
+
     IonRadioGroup,
     IonRadio,
     IonListHeader,

@@ -1,4 +1,6 @@
 export const environment = {
   production: true,
-  apiBase: 'http://localhost:3000/api',
+  // For production, use relative path so it works when
+  // the SPA is served by the same host as the API
+  apiBase: '/api',
 };

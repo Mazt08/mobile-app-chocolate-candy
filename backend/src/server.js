@@ -29,7 +29,22 @@ app.get("/", (_req, res) => {
     );
 });
 
-app.get("/api/health", (_req, res) => res.json({ ok: true }));
+app.get("/api/health", async (_req, res) => {
+  const info = { ok: true, driver: config.DB_DRIVER };
+  try {
+    // light ping: try fetching categories (works for both drivers)
+    await Promise.resolve(db.getCategories());
+    info["db"] = "up";
+  } catch (e) {
+    info["db"] = "down";
+    info["error"] = String(e?.message || e);
+  }
+  res.json({
+    ok: true,
+    driver: config.DB_DRIVER,
+    time: new Date().toISOString(),
+  });
+});
 
 app.get("/api/categories", async (_req, res) => {
   try {
@@ -46,7 +61,8 @@ app.get("/api/products", async (req, res) => {
     // If driver has getProducts with filtering, use it; otherwise emulate
     const raw = await Promise.resolve(db.getProducts({ q, category, sort }));
     if (Array.isArray(raw)) return res.json(raw);
-    let items = db.getProducts();
+    // Fallback path: get all and filter locally (ensure awaited)
+    let items = await Promise.resolve(db.getProducts());
     if (q) {
       const term = String(q).toLowerCase();
       items = items.filter((p) => p.name.toLowerCase().includes(term));
@@ -59,6 +75,96 @@ app.get("/api/products", async (req, res) => {
     if (sort === "priceDesc")
       items = items.slice().sort((a, b) => b.price - a.price);
     res.json(items);
+  } catch (e) {
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// Admin: basic Products CRUD (JSON driver supports full CRUD; MySQL not implemented)
+app.get(
+  "/api/admin/products",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (_req, res) => {
+    try {
+      const items = await Promise.resolve(db.getProducts());
+      res.json(items);
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  }
+);
+
+app.post(
+  "/api/admin/products",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (req, res) => {
+    try {
+      if (typeof db.createProduct !== "function")
+        return res
+          .status(501)
+          .json({ error: "Driver does not support product creation" });
+      const created = await Promise.resolve(db.createProduct(req.body || {}));
+      res.status(201).json(created);
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  }
+);
+
+app.patch(
+  "/api/admin/products/:id",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (req, res) => {
+    try {
+      if (typeof db.updateProduct !== "function")
+        return res
+          .status(501)
+          .json({ error: "Driver does not support product update" });
+      const updated = await Promise.resolve(
+        db.updateProduct(req.params.id, req.body || {})
+      );
+      if (!updated) return res.status(404).json({ error: "Not found" });
+      res.json(updated);
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  }
+);
+
+app.delete(
+  "/api/admin/products/:id",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (req, res) => {
+    try {
+      if (typeof db.deleteProduct !== "function")
+        return res
+          .status(501)
+          .json({ error: "Driver does not support product deletion" });
+      const ok = await Promise.resolve(db.deleteProduct(req.params.id));
+      if (!ok) return res.status(404).json({ error: "Not found" });
+      res.status(204).send();
+    } catch (e) {
+      res.status(500).json({ error: String(e.message || e) });
+    }
+  }
+);
+
+// Developers (used by Developers page)
+app.get("/api/developers", async (_req, res) => {
+  try {
+    if (typeof db.getDevelopers !== "function") {
+      return res.status(501).json({ error: "Driver missing getDevelopers" });
+    }
+    const data = await Promise.resolve(db.getDevelopers());
+    res.json(data);
   } catch (e) {
     res.status(500).json({ error: String(e.message || e) });
   }
