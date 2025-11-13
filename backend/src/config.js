@@ -2,7 +2,7 @@ require("dotenv").config();
 
 module.exports = {
   PORT: process.env.PORT || 3000,
-  DB_DRIVER: process.env.DB_DRIVER || "json", // 'json' | 'mysql'
+  DB_DRIVER: process.env.DB_DRIVER || "mysql", // mysql-only mode
   MYSQL: {
     host: process.env.MYSQL_HOST || "127.0.0.1",
     port: +(process.env.MYSQL_PORT || 3306),

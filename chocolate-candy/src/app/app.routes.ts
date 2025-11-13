@@ -25,6 +25,12 @@ export const routes: Routes = [
       import('./pages/offers/offers.page').then((m) => m.OffersPage),
   },
   {
+    path: 'contact',
+    loadComponent: () =>
+      import('src/app/pages/contact/contact.page').then((m) => m.ContactPage),
+    canMatch: [authGuard],
+  },
+  {
     path: 'favorites',
     loadComponent: () =>
       import('./placeholders/generic.page').then((m) =>
@@ -41,6 +47,22 @@ export const routes: Routes = [
     path: 'orders',
     loadComponent: () =>
       import('./pages/orders/orders.page').then((m) => m.OrdersPage),
+    canMatch: [authGuard],
+  },
+  {
+    path: 'messages',
+    loadComponent: () =>
+      import('src/app/pages/messages/messages.page').then(
+        (m) => m.MessagesPage
+      ),
+    canMatch: [authGuard],
+  },
+  {
+    path: 'messages/:id',
+    loadComponent: () =>
+      import('src/app/pages/messages/conversation.page').then(
+        (m) => m.ConversationPage
+      ),
     canMatch: [authGuard],
   },
   {
@@ -123,6 +145,24 @@ export const routes: Routes = [
     path: 'admin/orders',
     loadComponent: () =>
       import('./pages/admin/orders.page').then((m) => m.AdminOrdersPage),
+    canMatch: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
+  },
+  {
+    path: 'admin/messages',
+    loadComponent: () =>
+      import('src/app/pages/admin/messages.page').then(
+        (m) => m.AdminMessagesPage
+      ),
+    canMatch: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
+  },
+  {
+    path: 'admin/messages/:id',
+    loadComponent: () =>
+      import('src/app/pages/admin/message-detail.page').then(
+        (m) => m.AdminMessageDetailPage
+      ),
     canMatch: [authGuard, roleGuard],
     data: { roles: ['admin'] },
   },

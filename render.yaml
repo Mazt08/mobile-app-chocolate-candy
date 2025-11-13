@@ -1,39 +1,37 @@
 services:
-  # Frontend: Ionic Angular app as a Static Site
-  - type: static_site
-    name: chocolate-candy-frontend
-    rootDir: chocolate-candy
-    buildCommand: npm ci && npm run build
-    staticPublishPath: www
-    envVars:
-      - key: NODE_VERSION
-        value: 20
-    # Optional: SPA rewrite for Angular routes
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
-  # Backend: Node/Express API
+  # Single Web Service: builds frontend and serves SPA + API from Express
   - type: web
-    name: chocolate-candy-backend
+    name: chocolate-candy
     env: node
-    rootDir: backend
-    buildCommand: npm ci
-    startCommand: npm start
+    rootDir: .
+    buildCommand: |
+      cd backend && npm ci && cd ..
+      cd chocolate-candy && npm ci && npm run build && cd ..
+    startCommand: node backend/src/server.js
     envVars:
       - key: NODE_VERSION
         value: 20
       - key: PORT
         value: 3000
-      # Use the JSON driver on the free tier to avoid needing an external DB
-      - key: DB_DRIVER
-        value: json
       - key: JWT_SECRET
         generateValue: true
-      # To switch to MySQL later, change DB_DRIVER to `mysql` and set these:
-      # - MYSQL_HOST
-      # - MYSQL_PORT (3306)
-      # - MYSQL_USER
-      # - MYSQL_PASSWORD
-      # - MYSQL_DATABASE
+      - key: DB_DRIVER
+        value: mysql
+      # Set these to your managed MySQL (e.g., PlanetScale or Cloud SQL)
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_PORT
+        value: 3306
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_DB
+        sync: false
+      # Use a persistent disk for uploads (served at /uploads)
+      - key: UPLOAD_DIR
+        value: /var/uploads
+    disk:
+      name: uploads
+      mountPath: /var/uploads
+      sizeGB: 1

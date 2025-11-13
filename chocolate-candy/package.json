@@ -35,7 +35,8 @@
     "chart.js": "^4.4.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^20.0.0",

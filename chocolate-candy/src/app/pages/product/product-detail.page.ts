@@ -14,7 +14,6 @@ import {
   IonBadge,
   IonSkeletonText,
 } from '@ionic/angular/standalone';
-import { FLAT_PRODUCTS } from '../../data/catalog.data';
 import type { Product } from '../../models/product.model';
 import { ApiService } from '../../services/api.service';
 import { CartService } from '../../cart/cart.service';
@@ -164,10 +163,7 @@ export class ProductDetailPage {
   ) {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (Number.isFinite(id)) {
-      // Local fallback first
-      this.product = FLAT_PRODUCTS.find((p) => p.id === id) || null;
-      if (this.product) this.loading = false;
-      // Try hydrate from backend list
+      // Load from backend list and find by id
       this.api.getProducts().subscribe({
         next: (arr) => {
           const found = Array.isArray(arr)

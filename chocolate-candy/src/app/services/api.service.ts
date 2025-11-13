@@ -39,6 +39,7 @@ export class ApiService {
   createOrder(payload: {
     items: Array<{ id: number; name: string; price: number; qty: number }>;
     total: number;
+    meta?: any;
   }) {
     return this.http.post<any>(`${this.base}/orders`, payload);
   }
@@ -98,5 +99,89 @@ export class ApiService {
   }
   deleteAdminProduct(id: number) {
     return this.http.delete<void>(`${this.base}/admin/products/${id}`);
+  }
+
+  // Admin Offers CRUD
+  getAdminOffers() {
+    return this.http.get<any[]>(`${this.base}/admin/offers`);
+  }
+  createAdminOffer(payload: any) {
+    return this.http.post<any>(`${this.base}/admin/offers`, payload);
+  }
+  updateAdminOffer(id: number, payload: any) {
+    return this.http.patch<any>(`${this.base}/admin/offers/${id}`, payload);
+  }
+  deleteAdminOffer(id: number) {
+    return this.http.delete<void>(`${this.base}/admin/offers/${id}`);
+  }
+
+  // Messaging (user)
+  contact(subject: string, message: string) {
+    return this.http.post<any>(`${this.base}/contact`, { subject, message });
+  }
+  getMyConversations() {
+    return this.http.get<any[]>(`${this.base}/messages`);
+  }
+  getConversation(id: number) {
+    return this.http.get<any>(`${this.base}/messages/${id}`);
+  }
+  replyToConversation(id: number, message?: string, imageUrl?: string) {
+    const payload: any = {};
+    if (message) payload.message = message;
+    if (imageUrl) payload.imageUrl = imageUrl;
+    return this.http.post<any>(`${this.base}/messages/${id}/reply`, payload);
+  }
+  markConversationRead(id: number) {
+    return this.http.post<any>(`${this.base}/messages/${id}/read`, {});
+  }
+  deleteConversation(id: number) {
+    return this.http.delete<void>(`${this.base}/messages/${id}`);
+  }
+
+  // Messaging (admin)
+  adminGetConversations() {
+    return this.http.get<any[]>(`${this.base}/admin/messages`);
+  }
+  adminGetConversation(id: number) {
+    return this.http.get<any>(`${this.base}/admin/messages/${id}`);
+  }
+  adminReplyToConversation(id: number, message?: string, imageUrl?: string) {
+    const payload: any = {};
+    if (message) payload.message = message;
+    if (imageUrl) payload.imageUrl = imageUrl;
+    return this.http.post<any>(
+      `${this.base}/admin/messages/${id}/reply`,
+      payload
+    );
+  }
+  adminSetConversationStatus(id: number, status: 'open' | 'closed') {
+    return this.http.patch<any>(`${this.base}/admin/messages/${id}/status`, {
+      status,
+    });
+  }
+  adminMarkConversationRead(id: number) {
+    return this.http.post<any>(`${this.base}/admin/messages/${id}/read`, {});
+  }
+  adminDeleteConversation(id: number) {
+    return this.http.delete<void>(`${this.base}/admin/messages/${id}`);
+  }
+
+  // Uploads
+  uploadImage(file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ url: string }>(`${this.base}/upload`, form);
+  }
+
+  // Unread counts
+  getUserUnreadCount() {
+    return this.http.get<{ unread: number }>(
+      `${this.base}/messages/unread-count`
+    );
+  }
+  getAdminUnreadCount() {
+    return this.http.get<{ unread: number }>(
+      `${this.base}/admin/messages/unread-count`
+    );
   }
 }

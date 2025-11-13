@@ -16,7 +16,6 @@ import {
 } from '@ionic/angular/standalone';
 import { CartService } from '../../cart/cart.service';
 import { ActivatedRoute } from '@angular/router';
-import { CATALOG_DATA, FLAT_PRODUCTS } from '../../data/catalog.data';
 import type { Product, ProductCategory } from '../../models/product.model';
 import { ProductListComponent } from '../../components/product-list/product-list.component';
 import { ApiService } from '../../services/api.service';
@@ -116,8 +115,8 @@ export class CatalogPage {
   sort: 'popular' | 'priceAsc' | 'priceDesc' = 'popular';
   categories: string[] = ['All'];
   activeCat: string = 'All';
-  categoriesData: ProductCategory[] = CATALOG_DATA;
-  products: Product[] = FLAT_PRODUCTS;
+  categoriesData: ProductCategory[] = [];
+  products: Product[] = [];
   toastOpen = false;
   get visibleCategories(): ProductCategory[] {
     const filterFn = (p: Product) =>
@@ -134,10 +133,8 @@ export class CatalogPage {
     private route: ActivatedRoute,
     private api: ApiService
   ) {
-    // derive categories list from data
-    const set = new Set<string>(['All']);
-    this.categoriesData.forEach((cat) => set.add(cat.name));
-    this.categories = Array.from(set);
+    // initialize categories to All; will hydrate from backend
+    this.categories = ['All'];
     this.route.queryParamMap.subscribe((qp) => {
       const cat = qp.get('category');
       if (cat && this.categories.includes(cat)) {
@@ -150,11 +147,13 @@ export class CatalogPage {
         this.sort = s;
     });
 
-    // Try to hydrate from backend (fallback to local data already assigned)
+    // Hydrate from backend
     this.api.getCategories().subscribe({
       next: (cats) => {
         const set = new Set<string>(['All']);
-        cats.forEach((c: any) => set.add(typeof c === 'string' ? c : c.name));
+        (cats || []).forEach((c: any) =>
+          set.add(typeof c === 'string' ? c : c.name)
+        );
         this.categories = Array.from(set);
       },
       error: () => {},

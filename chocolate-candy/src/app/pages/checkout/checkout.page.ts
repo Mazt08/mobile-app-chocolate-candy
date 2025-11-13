@@ -24,6 +24,7 @@ import {
 } from '@ionic/angular/standalone';
 import { CartService } from '../../cart/cart.service';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../auth/auth.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
@@ -65,6 +66,10 @@ import { environment } from '../../../environments/environment';
             >
           </ion-item>
           <ion-item>
+            <ion-label>Shipping</ion-label>
+            <strong slot="end">₱ {{ shippingFee | number : '1.0-2' }}</strong>
+          </ion-item>
+          <ion-item>
             <ion-label>Total</ion-label>
             <strong slot="end">₱ {{ total | number : '1.0-2' }}</strong>
           </ion-item>
@@ -78,15 +83,30 @@ import { environment } from '../../../environments/environment';
       </ng-template>
 
       <form [formGroup]="form" (ngSubmit)="placeOrder()" class="form">
-        <ion-list>
-          <ion-item>
-            <ion-input
-              label="Promo code"
-              labelPlacement="stacked"
-              placeholder="SWEET10 or FREESHIP"
-              formControlName="promo"
-              (ionInput)="recomputeTotals()"
-            ></ion-input>
+        <ion-list *ngIf="offers.length">
+          <ion-list-header>Special Offers</ion-list-header>
+          <ion-radio-group
+            [value]="selectedOfferId"
+            (ionChange)="onOfferChange($event)"
+          >
+            <ion-item *ngFor="let o of offers">
+              <ion-label>
+                <h3>{{ o.title }}</h3>
+                <p>
+                  {{ o.subtitle }}
+                  <ng-container *ngIf="o.points_cost > 0">
+                    • Costs {{ o.points_cost }} pts
+                  </ng-container>
+                </p>
+              </ion-label>
+              <ion-radio slot="end" [value]="o.id"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+          <ion-item
+            *ngIf="selectedOfferRequiresPoints && !hasEnoughPoints"
+            color="danger"
+          >
+            <ion-label>Choco points are not enough</ion-label>
           </ion-item>
         </ion-list>
         <ion-list>
@@ -230,8 +250,17 @@ export class CheckoutPage {
   subtotal = this.items.reduce((s: number, i: any) => s + i.qty * i.price, 0);
   discountLabel = '';
   discountValue = 0;
+  shippingFee = 50;
+  offers: any[] = [];
+  selectedOfferId: number | null = null;
+  selectedOfferRequiresPoints = false;
+  hasEnoughPoints = true;
+  get userPoints() {
+    return this.auth.user?.points ?? 0;
+  }
   get total() {
-    return Math.max(0, this.subtotal - this.discountValue);
+    const net = Math.max(0, this.subtotal - this.discountValue);
+    return net + this.shippingFee;
   }
 
   toastOpen = false;
@@ -242,7 +271,6 @@ export class CheckoutPage {
     address: ['', [Validators.required, Validators.minLength(4)]],
     city: ['', [Validators.required]],
     notes: [''],
-    promo: [''],
     payment: ['cod', [Validators.required]],
     paypalPhone: [''],
     paypalPassword: [''],
@@ -252,20 +280,47 @@ export class CheckoutPage {
     private cart: CartService,
     private api: ApiService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private auth: AuthService
   ) {}
 
-  recomputeTotals() {
-    const code = (this.form.value.promo || '').toString().trim().toUpperCase();
+  ngOnInit() {
+    this.api.getOffers().subscribe((rows) => {
+      this.offers = rows || [];
+      // Auto-select the first one if exists
+      if (this.offers.length) {
+        this.selectedOfferId = this.offers[0].id;
+        this.applyOffer();
+      }
+    });
+  }
+
+  onOfferChange(ev: any) {
+    this.selectedOfferId = ev?.detail?.value ?? null;
+    this.applyOffer();
+  }
+
+  applyOffer() {
     this.discountLabel = '';
     this.discountValue = 0;
-    if (!this.subtotal) return;
-    if (code === 'SWEET10') {
-      this.discountLabel = 'SWEET10 (10%)';
-      this.discountValue = +(this.subtotal * 0.1).toFixed(2);
-    } else if (code === 'FREESHIP') {
-      this.discountLabel = 'FREESHIP (₱50)';
-      this.discountValue = Math.min(50, this.subtotal);
+    this.selectedOfferRequiresPoints = false;
+    this.hasEnoughPoints = true;
+    if (!this.subtotal || !this.selectedOfferId) return;
+    const o = this.offers.find((x) => x.id === this.selectedOfferId);
+    if (!o) return;
+    const t = (o.discount_type || 'percent').toLowerCase();
+    const val = Number(o.discount_value || 0);
+    if (t === 'fixed') {
+      this.discountLabel = `${o.title} (₱${val})`;
+      this.discountValue = Math.min(val, this.subtotal);
+    } else {
+      const d = +(this.subtotal * (val / 100)).toFixed(2);
+      this.discountLabel = `${o.title} (${val}%)`;
+      this.discountValue = Math.min(d, this.subtotal);
+    }
+    if (o.points_cost && o.points_cost > 0) {
+      this.selectedOfferRequiresPoints = true;
+      this.hasEnoughPoints = this.userPoints >= Number(o.points_cost);
     }
   }
 
@@ -291,8 +346,9 @@ export class CheckoutPage {
       })),
       total: this.total,
       meta: {
-        promo: this.form.value.promo || '',
+        offerId: this.selectedOfferId,
         discountLabel: this.discountLabel,
+        shippingFee: this.shippingFee,
         payment: this.form.value.payment,
         contact: {
           name: this.form.value.name,
@@ -302,7 +358,7 @@ export class CheckoutPage {
         },
       },
     } as const;
-    this.api.createOrder(payload).subscribe({
+    this.api.createOrder(payload as any).subscribe({
       next: (res: any) => {
         this.cart.clear();
         this.toastOpen = true;
@@ -312,9 +368,14 @@ export class CheckoutPage {
       },
       error: (err) => {
         console.error('Order create failed', err);
-        alert(
-          `Could not place your order right now. Please make sure the server is running at ${environment.apiBase} and that you are logged in. Your cart has been preserved.`
-        );
+        const msg = err?.error?.error || 'Unknown error';
+        if (/choco points/i.test(msg)) {
+          alert('Choco points are not enough for this offer.');
+        } else {
+          alert(
+            `Could not place your order right now. Please make sure the server is running at ${environment.apiBase} and that you are logged in. Your cart has been preserved.`
+          );
+        }
       },
     });
   }

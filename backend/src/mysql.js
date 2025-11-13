@@ -26,12 +26,239 @@ function getPool() {
         await pool.query(
           "CREATE TABLE IF NOT EXISTS order_meta (order_id INT PRIMARY KEY, meta TEXT, CONSTRAINT fk_meta_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE)"
         );
+        // Conversations and messages tables
+        await pool.query(
+          "CREATE TABLE IF NOT EXISTS conversations (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT NOT NULL, subject VARCHAR(255) NOT NULL, status ENUM('open','closed') NOT NULL DEFAULT 'open', deleted_by_user TINYINT(1) NOT NULL DEFAULT 0, deleted_by_admin TINYINT(1) NOT NULL DEFAULT 0, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, CONSTRAINT fk_conv_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)"
+        );
+        await pool.query(
+          "CREATE TABLE IF NOT EXISTS messages (id INT AUTO_INCREMENT PRIMARY KEY, conversation_id INT NOT NULL, sender_role ENUM('user','admin') NOT NULL, sender_user_id INT NULL, body TEXT NOT NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT fk_msg_conv FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE)"
+        );
+        // Add unread counters and last-read timestamps, and optional image_url
+        try {
+          await pool.query(
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS user_unread INT NOT NULL DEFAULT 0"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS admin_unread INT NOT NULL DEFAULT 0"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS last_read_user_at DATETIME NULL"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE conversations ADD COLUMN IF NOT EXISTS last_read_admin_at DATETIME NULL"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE messages ADD COLUMN IF NOT EXISTS image_url VARCHAR(512) NULL"
+          );
+        } catch (e) {}
+        // Ensure new columns for offers and users.points exist (idempotent)
+        try {
+          await pool.query(
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS points INT NOT NULL DEFAULT 0"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE offers ADD COLUMN IF NOT EXISTS discount_type ENUM('percent','fixed') NOT NULL DEFAULT 'percent'"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE offers ADD COLUMN IF NOT EXISTS discount_value DECIMAL(10,2) NOT NULL DEFAULT 0"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE offers ADD COLUMN IF NOT EXISTS points_cost INT NOT NULL DEFAULT 0"
+          );
+        } catch (e) {}
+        try {
+          await pool.query(
+            "ALTER TABLE offers ADD COLUMN IF NOT EXISTS active TINYINT(1) NOT NULL DEFAULT 1"
+          );
+        } catch (e) {}
       } catch (e) {
         console.warn("[DB] order_meta ensure failed:", e?.message || e);
       }
     })();
   }
   return pool;
+}
+
+// ---------------- Conversations & Messages ----------------
+async function createConversation(userId, subject, body) {
+  const conn = await getPool().getConnection();
+  try {
+    await conn.beginTransaction();
+    const [res] = await conn.query(
+      "INSERT INTO conversations (user_id, subject, admin_unread) VALUES (?, ?, ?)",
+      [userId, String(subject || "").trim(), 1]
+    );
+    const convId = res.insertId;
+    await conn.query(
+      "INSERT INTO messages (conversation_id, sender_role, sender_user_id, body) VALUES (?,?,?,?)",
+      [convId, "user", userId, String(body || "").trim()]
+    );
+    await conn.commit();
+    return { id: convId, user_id: userId, subject, status: "open" };
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
+  }
+}
+
+async function listUserConversations(userId) {
+  const [rows] = await getPool().query(
+    "SELECT id, subject, status, created_at, updated_at, user_unread FROM conversations WHERE user_id = ? AND deleted_by_user = 0 ORDER BY updated_at DESC",
+    [userId]
+  );
+  return rows;
+}
+
+async function getConversationForUser(id, userId) {
+  const [rows] = await getPool().query(
+    "SELECT id, user_id, subject, status, created_at, updated_at, user_unread FROM conversations WHERE id = ? AND user_id = ? AND deleted_by_user = 0 LIMIT 1",
+    [id, userId]
+  );
+  return rows[0] || null;
+}
+
+async function listMessages(conversationId) {
+  const [rows] = await getPool().query(
+    "SELECT id, sender_role, sender_user_id, body, image_url, created_at FROM messages WHERE conversation_id = ? ORDER BY id ASC",
+    [conversationId]
+  );
+  return rows;
+}
+
+async function addMessage(
+  conversationId,
+  senderRole,
+  senderUserId,
+  body,
+  imageUrl = null
+) {
+  const conn = await getPool().getConnection();
+  try {
+    await conn.beginTransaction();
+    const [res] = await conn.query(
+      "INSERT INTO messages (conversation_id, sender_role, sender_user_id, body, image_url) VALUES (?,?,?,?,?)",
+      [
+        conversationId,
+        senderRole,
+        senderUserId || null,
+        String(body || "").trim(),
+        imageUrl,
+      ]
+    );
+    if (senderRole === "user") {
+      await conn.query(
+        "UPDATE conversations SET admin_unread = admin_unread + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [conversationId]
+      );
+    } else {
+      await conn.query(
+        "UPDATE conversations SET user_unread = user_unread + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [conversationId]
+      );
+    }
+    await conn.commit();
+    return { id: res.insertId };
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
+  }
+}
+
+async function deleteConversationForUser(conversationId, userId) {
+  // Soft delete for the user; if admin also deleted, hard delete via cascade by deleting conversation
+  const [rows] = await getPool().query(
+    "SELECT deleted_by_admin FROM conversations WHERE id = ? AND user_id = ?",
+    [conversationId, userId]
+  );
+  if (!rows[0]) return false;
+  const deletedByAdmin = !!rows[0].deleted_by_admin;
+  if (deletedByAdmin) {
+    await getPool().query("DELETE FROM conversations WHERE id = ?", [
+      conversationId,
+    ]);
+    return true;
+  }
+  const [res] = await getPool().query(
+    "UPDATE conversations SET deleted_by_user = 1 WHERE id = ? AND user_id = ?",
+    [conversationId, userId]
+  );
+  return res.affectedRows > 0;
+}
+
+// Admin-side
+async function adminListConversations() {
+  const [rows] = await getPool().query(
+    "SELECT id, user_id, subject, status, created_at, updated_at, admin_unread, deleted_by_user FROM conversations WHERE deleted_by_admin = 0 ORDER BY updated_at DESC"
+  );
+  return rows;
+}
+
+async function adminGetConversation(id) {
+  const [rows] = await getPool().query(
+    "SELECT id, user_id, subject, status, created_at, updated_at, admin_unread, deleted_by_user FROM conversations WHERE id = ? AND deleted_by_admin = 0 LIMIT 1",
+    [id]
+  );
+  return rows[0] || null;
+}
+
+async function adminDeleteConversation(id) {
+  const [[row]] = await getPool().query(
+    "SELECT deleted_by_user FROM conversations WHERE id = ?",
+    [id]
+  );
+  if (!row) return false;
+  const deletedByUser = !!row.deleted_by_user;
+  if (deletedByUser) {
+    await getPool().query("DELETE FROM conversations WHERE id = ?", [id]);
+    return true;
+  }
+  const [res] = await getPool().query(
+    "UPDATE conversations SET deleted_by_admin = 1 WHERE id = ?",
+    [id]
+  );
+  return res.affectedRows > 0;
+}
+
+async function setConversationStatus(id, status) {
+  const [res] = await getPool().query(
+    "UPDATE conversations SET status = ? WHERE id = ?",
+    [status, id]
+  );
+  return res.affectedRows > 0;
+}
+
+async function markReadForUser(id, userId) {
+  const [res] = await getPool().query(
+    "UPDATE conversations SET user_unread = 0, last_read_user_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?",
+    [id, userId]
+  );
+  return res.affectedRows > 0;
+}
+
+async function markReadForAdmin(id) {
+  const [res] = await getPool().query(
+    "UPDATE conversations SET admin_unread = 0, last_read_admin_at = CURRENT_TIMESTAMP WHERE id = ?",
+    [id]
+  );
+  return res.affectedRows > 0;
 }
 
 async function getCategories() {
@@ -167,10 +394,10 @@ async function deleteProduct(id) {
 
 async function getOffers() {
   const [rows] = await getPool().query(
-    "SELECT title, subtitle, badge, target_sort AS sort, target_category AS category FROM offers"
+    "SELECT id, title, subtitle, badge, target_sort AS sort, target_category AS category, discount_type, discount_value, points_cost, active FROM offers WHERE active = 1"
   );
-  // Map to frontend shape
   return rows.map((r) => ({
+    id: r.id,
     title: r.title,
     subtitle: r.subtitle,
     badge: r.badge,
@@ -179,7 +406,133 @@ async function getOffers() {
       : r.sort
       ? { sort: r.sort }
       : {},
+    discount_type: r.discount_type,
+    discount_value: Number(r.discount_value),
+    points_cost: Number(r.points_cost || 0),
+    active: !!r.active,
   }));
+}
+
+// Admin Offers CRUD
+async function adminListOffers() {
+  const [rows] = await getPool().query(
+    "SELECT id, title, subtitle, badge, target_sort AS sort, target_category AS category, discount_type, discount_value, points_cost, active FROM offers ORDER BY id DESC"
+  );
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    subtitle: r.subtitle,
+    badge: r.badge,
+    sort: r.sort,
+    category: r.category,
+    discount_type: r.discount_type,
+    discount_value: Number(r.discount_value),
+    points_cost: Number(r.points_cost || 0),
+    active: !!r.active,
+  }));
+}
+
+async function adminCreateOffer(input) {
+  const title = String(input?.title || "").trim();
+  const subtitle = String(input?.subtitle || "").trim();
+  const badge = String(input?.badge || "").trim();
+  const target_sort = input?.target?.sort || input?.sort || null;
+  const target_category = input?.target?.category || input?.category || null;
+  const discount_type = input?.discount_type === "fixed" ? "fixed" : "percent";
+  const discount_value = Number(input?.discount_value || 0);
+  const points_cost = Number(input?.points_cost || 0);
+  const active = input?.active ? 1 : 0;
+  const [res] = await getPool().query(
+    "INSERT INTO offers (title, subtitle, badge, target_sort, target_category, discount_type, discount_value, points_cost, active) VALUES (?,?,?,?,?,?,?,?,?)",
+    [
+      title,
+      subtitle,
+      badge,
+      target_sort,
+      target_category,
+      discount_type,
+      discount_value,
+      points_cost,
+      active,
+    ]
+  );
+  const id = res.insertId;
+  return {
+    id,
+    title,
+    subtitle,
+    badge,
+    sort: target_sort,
+    category: target_category,
+    discount_type,
+    discount_value,
+    points_cost,
+    active: !!active,
+  };
+}
+
+async function adminUpdateOffer(id, patch) {
+  const fields = [];
+  const params = [];
+  if (patch?.title !== undefined) {
+    fields.push("title = ?");
+    params.push(String(patch.title));
+  }
+  if (patch?.subtitle !== undefined) {
+    fields.push("subtitle = ?");
+    params.push(String(patch.subtitle));
+  }
+  if (patch?.badge !== undefined) {
+    fields.push("badge = ?");
+    params.push(String(patch.badge));
+  }
+  if (patch?.sort !== undefined || patch?.target?.sort !== undefined) {
+    fields.push("target_sort = ?");
+    params.push(patch?.target?.sort ?? patch?.sort ?? null);
+  }
+  if (patch?.category !== undefined || patch?.target?.category !== undefined) {
+    fields.push("target_category = ?");
+    params.push(patch?.target?.category ?? patch?.category ?? null);
+  }
+  if (patch?.discount_type !== undefined) {
+    const v = patch.discount_type === "fixed" ? "fixed" : "percent";
+    fields.push("discount_type = ?");
+    params.push(v);
+  }
+  if (patch?.discount_value !== undefined) {
+    fields.push("discount_value = ?");
+    params.push(Number(patch.discount_value));
+  }
+  if (patch?.points_cost !== undefined) {
+    fields.push("points_cost = ?");
+    params.push(Number(patch.points_cost));
+  }
+  if (patch?.active !== undefined) {
+    fields.push("active = ?");
+    params.push(patch.active ? 1 : 0);
+  }
+  if (!fields.length) {
+    const [rows] = await getPool().query(
+      "SELECT id, title, subtitle, badge, target_sort AS sort, target_category AS category, discount_type, discount_value, points_cost, active FROM offers WHERE id = ?",
+      [id]
+    );
+    return rows[0] || null;
+  }
+  params.push(id);
+  await getPool().query(
+    `UPDATE offers SET ${fields.join(", ")} WHERE id = ?`,
+    params
+  );
+  const [rows] = await getPool().query(
+    "SELECT id, title, subtitle, badge, target_sort AS sort, target_category AS category, discount_type, discount_value, points_cost, active FROM offers WHERE id = ?",
+    [id]
+  );
+  return rows[0] || null;
+}
+
+async function adminDeleteOffer(id) {
+  const [res] = await getPool().query("DELETE FROM offers WHERE id = ?", [id]);
+  return res.affectedRows > 0;
 }
 
 async function getOrders(opts) {
@@ -294,6 +647,46 @@ async function createOrder(payload) {
       id,
       JSON.stringify(meta),
     ]);
+    // Points handling
+    let pointsSpent = 0;
+    let pointsEarned = 0;
+    if (payload?.userId) {
+      const [usrRows] = await conn.query(
+        "SELECT id, points FROM users WHERE id = ?",
+        [payload.userId]
+      );
+      const user = usrRows[0];
+      if (user) {
+        const offerId = payload?.meta?.offerId || null;
+        if (offerId) {
+          const [offRows] = await conn.query(
+            "SELECT points_cost FROM offers WHERE id = ? AND active = 1",
+            [offerId]
+          );
+          const off = offRows[0];
+          const cost = Number(off?.points_cost || 0);
+          if (cost > 0) {
+            if (Number(user.points) < cost) {
+              throw new Error("Choco points are not enough");
+            }
+            pointsSpent = cost;
+            await conn.query(
+              "UPDATE users SET points = points - ? WHERE id = ?",
+              [cost, payload.userId]
+            );
+          }
+        }
+        // Earn rule: 1 point per ₱100 (floor)
+        pointsEarned = Math.floor(Number(total) / 100);
+        if (pointsEarned > 0) {
+          await conn.query(
+            "UPDATE users SET points = points + ? WHERE id = ?",
+            [pointsEarned, payload.userId]
+          );
+        }
+      }
+    }
+
     await conn.commit();
     return {
       id,
@@ -306,7 +699,12 @@ async function createOrder(payload) {
         price: Number(i.price),
         qty: Number(i.qty),
       })),
-      meta,
+      meta: {
+        ...meta,
+        ...(payload?.meta?.offerId ? { offerId: payload.meta.offerId } : {}),
+        ...(pointsSpent ? { pointsSpent } : {}),
+        ...(pointsEarned ? { pointsEarned } : {}),
+      },
     };
   } catch (e) {
     await conn.rollback();
@@ -328,6 +726,25 @@ module.exports = {
   deleteProduct,
   // expose pool for diagnostics endpoint
   getPool,
+  // messaging (user)
+  createConversation,
+  listUserConversations,
+  getConversationForUser,
+  listMessages,
+  addMessage,
+  deleteConversationForUser,
+  // messaging (admin)
+  adminListConversations,
+  adminGetConversation,
+  adminDeleteConversation,
+  setConversationStatus,
+  markReadForUser,
+  markReadForAdmin,
+  // offers admin
+  adminListOffers,
+  adminCreateOffer,
+  adminUpdateOffer,
+  adminDeleteOffer,
   async updateOrderStatus(id, status) {
     await getPool().query("UPDATE orders SET status = ? WHERE id = ?", [
       status,
@@ -423,14 +840,28 @@ module.exports = {
   // Users API (used by server routes)
   async findUserByEmailOrUsername(identity) {
     const [rows] = await getPool().query(
-      "SELECT id, name, username, email, password, role FROM users WHERE email = ? OR username = ? LIMIT 1",
+      "SELECT id, name, username, email, password, role, points FROM users WHERE email = ? OR username = ? LIMIT 1",
       [identity, identity]
+    );
+    return rows[0];
+  },
+  async findUserByEmail(email) {
+    const [rows] = await getPool().query(
+      "SELECT id, name, username, email, password, role, points FROM users WHERE email = ? LIMIT 1",
+      [email]
+    );
+    return rows[0];
+  },
+  async findUserByUsername(username) {
+    const [rows] = await getPool().query(
+      "SELECT id, name, username, email, password, role, points FROM users WHERE username = ? LIMIT 1",
+      [username]
     );
     return rows[0];
   },
   async findUserById(id) {
     const [rows] = await getPool().query(
-      "SELECT id, name, username, email, password, role FROM users WHERE id = ? LIMIT 1",
+      "SELECT id, name, username, email, password, role, points FROM users WHERE id = ? LIMIT 1",
       [id]
     );
     return rows[0];
@@ -445,7 +876,7 @@ module.exports = {
   },
   async listUsers() {
     const [rows] = await getPool().query(
-      "SELECT id, name, username, email, role FROM users ORDER BY id"
+      "SELECT id, name, username, email, role, points FROM users ORDER BY id"
     );
     return rows;
   },

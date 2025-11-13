@@ -53,7 +53,7 @@ export class AuthService {
       id: res.user?.id,
       token: res.token,
       avatar: null,
-      points: 50,
+      points: res.user?.points ?? 0,
       isLoggedIn: true,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(user));

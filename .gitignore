@@ -1,1 +1,13 @@
 node_modules
+# Build output
+chocolate-candy/www/
+
+# Android build
+chocolate-candy/android/build/
+chocolate-candy/android/app/build/
+
+# iOS derived data (handled also in platform .gitignores)
+
+# Backend uploads and env
+backend/uploads/
+backend/.env

@@ -132,30 +132,7 @@ interface Order {
 })
 export class OrdersPage {
   filter: 'all' | 'processing' | 'delivered' = 'all';
-  orders: Order[] = [
-    {
-      id: 1024,
-      date: 'Oct 1, 2025',
-      items: [
-        { id: 1, name: 'Dark Truffle', price: 129, qty: 2 },
-        { id: 4, name: 'Hazelnut Praline', price: 141, qty: 1 },
-      ],
-      total: 399,
-      status: 'Delivered',
-      expanded: false,
-    },
-    {
-      id: 1025,
-      date: 'Oct 7, 2025',
-      items: [
-        { id: 2, name: 'Milk Caramel', price: 99, qty: 1 },
-        { id: 5, name: 'Almond Crunch', price: 129, qty: 1 },
-      ],
-      total: 228,
-      status: 'Processing',
-      expanded: false,
-    },
-  ];
+  orders: Order[] = [];
 
   constructor(
     private cart: CartService,
@@ -164,7 +141,7 @@ export class OrdersPage {
   ) {
     this.api.getOrders().subscribe({
       next: (arr) => {
-        if (Array.isArray(arr) && arr.length) this.orders = arr as Order[];
+        if (Array.isArray(arr)) this.orders = arr as Order[];
       },
       error: () => {},
     });
@@ -179,12 +156,11 @@ export class OrdersPage {
     );
   }
 
-  toggle(o: any) {
-    // Navigate to detail view
+  toggle(o: Order) {
     this.router.navigate(['/orders', o.id]);
   }
 
-  reorder(o: any) {
+  reorder(o: Order) {
     for (const it of o.items) {
       this.cart.add({ id: it.id, name: it.name, price: it.price });
     }

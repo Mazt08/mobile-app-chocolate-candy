@@ -37,7 +37,15 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
   },
   {
     label: 'Activity',
-    items: [{ title: 'My Orders', route: '/orders', icon: 'receipt-outline' }],
+    items: [
+      { title: 'My Orders', route: '/orders', icon: 'receipt-outline' },
+      {
+        title: 'Messages',
+        route: '/messages',
+        icon: 'chatbubbles-outline',
+        visibleFor: 'user',
+      },
+    ],
   },
   {
     label: 'Account',
@@ -75,6 +83,12 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
     items: [
       { title: 'Help & FAQ', route: '/help', icon: 'help-circle-outline' },
       {
+        title: 'Contact Us',
+        route: '/contact',
+        icon: 'mail-outline',
+        visibleFor: 'user',
+      },
+      {
         title: 'About the App',
         route: '/about',
         icon: 'information-circle-outline',
@@ -103,6 +117,13 @@ export const APP_MENU_SECTIONS: MenuSection[] = [
         title: 'All Orders',
         route: '/admin/orders',
         icon: 'receipt-outline',
+        visibleFor: 'user',
+        visibleForRole: ['admin'],
+      },
+      {
+        title: 'Messages',
+        route: '/admin/messages',
+        icon: 'chatbubbles-outline',
         visibleFor: 'user',
         visibleForRole: ['admin'],
       },

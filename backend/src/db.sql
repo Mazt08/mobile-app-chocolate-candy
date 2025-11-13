@@ -33,7 +33,11 @@ CREATE TABLE offers (
   subtitle VARCHAR(300) NOT NULL,
   badge VARCHAR(50) NOT NULL,
   target_sort VARCHAR(50) NULL,
-  target_category VARCHAR(100) NULL
+  target_category VARCHAR(100) NULL,
+  discount_type ENUM('percent','fixed') NOT NULL DEFAULT 'percent',
+  discount_value DECIMAL(10,2) NOT NULL DEFAULT 0,
+  points_cost INT NOT NULL DEFAULT 0,
+  active TINYINT(1) NOT NULL DEFAULT 1
 );
 
 CREATE TABLE developers (
@@ -50,7 +54,8 @@ CREATE TABLE users (
   username VARCHAR(100) NOT NULL UNIQUE,
   email VARCHAR(200) NOT NULL UNIQUE,
   password VARCHAR(200) NOT NULL,
-  role ENUM('admin','staff','user') NOT NULL DEFAULT 'user'
+  role ENUM('admin','staff','user') NOT NULL DEFAULT 'user',
+  points INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE orders (
@@ -145,11 +150,13 @@ SELECT 6005, 'Valentine''s Heart Collection', 'Heart-shaped chocolates and truff
 INSERT INTO products (id, name, description, price, weight, img, category_id)
 SELECT 6006, 'Spicy Maya Hot Chocolate Blocks', 'Dark chocolate with cinnamon and chili for drinking.', 620.00, '150g (3 blocks)', 'assets/images/spicy-maya-hot-chocolate.jpg', id FROM categories WHERE name='Seasonal Specialties';
 
-INSERT INTO offers (title, subtitle, badge, target_sort, target_category) VALUES
-  ('Signature Bestsellers', 'Top picks from our signature bars', 'Hot', NULL, 'Signature Chocolate Bars'),
-  ('Caramel Lovers', 'Sweet caramel creations on promo', 'Yum', NULL, 'Caramel Chocolate Creations'),
-  ('Truffle Treats', 'Save on decadent truffles', 'Save', 'priceAsc', NULL),
-  ('Seasonal Highlights', 'Limited-time seasonal items', 'New', NULL, 'Seasonal Specialties');
+-- Seed offers with discount/points
+INSERT INTO offers (title, subtitle, badge, target_sort, target_category, discount_type, discount_value, points_cost, active) VALUES
+  ('Signature Bestsellers', 'Top picks from our signature bars', 'Hot', NULL, 'Signature Chocolate Bars', 'percent', 10.00, 0, 1),
+  ('Caramel Lovers', 'Sweet caramel creations on promo', 'Yum', NULL, 'Caramel Chocolate Creations', 'fixed', 50.00, 0, 1),
+  ('Truffle Treats', 'Save on decadent truffles', 'Save', 'priceAsc', NULL, 'percent', 5.00, 0, 1),
+  ('Premium 100-Points', 'Redeem 100 ChocoPoints for ₱100 off', 'Redeem', NULL, NULL, 'fixed', 100.00, 100, 1),
+  ('Seasonal Highlights', 'Limited-time seasonal items', 'New', NULL, 'Seasonal Specialties', 'percent', 8.00, 0, 1);
 
 INSERT INTO developers (name, role, github, img) VALUES
   ('John Reex O. Aspiras', 'Fullstack Developer', 'https://github.com/Mazt08', 'https://github.com/Mazt08.png'),

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ApiService } from '../../services/api.service';
 import {
   IonHeader,
   IonToolbar,
@@ -60,15 +61,30 @@ import {
   ],
 })
 export class CategoriesPage {
-  categories = [
-    { label: 'Dark', icon: 'moon-outline' },
-    { label: 'Milk', icon: 'cafe-outline' },
-    { label: 'White', icon: 'snow-outline' },
-    { label: 'Nuts', icon: 'leaf-outline' },
-    { label: 'Caramel', icon: 'flame-outline' },
-    { label: 'Fruit', icon: 'apple-outline' },
-  ];
-  constructor(private router: Router) {}
+  categories: Array<{ label: string; icon: string }> = [];
+  constructor(private router: Router, private api: ApiService) {
+    this.api.getCategories().subscribe({
+      next: (cats) => {
+        const iconOf = (name: string) => {
+          const n = name.toLowerCase();
+          if (n.includes('dark')) return 'moon-outline';
+          if (n.includes('milk')) return 'cafe-outline';
+          if (n.includes('white')) return 'snow-outline';
+          if (n.includes('caramel')) return 'flame-outline';
+          if (n.includes('nut')) return 'leaf-outline';
+          if (n.includes('fruit')) return 'apple-outline';
+          return 'pricetag-outline';
+        };
+        this.categories = (cats || []).map((c: any) => {
+          const label = typeof c === 'string' ? c : c.name;
+          return { label, icon: iconOf(label) };
+        });
+      },
+      error: () => {
+        this.categories = [];
+      },
+    });
+  }
   goTo(label: string) {
     this.router.navigate(['/catalog'], { queryParams: { category: label } });
   }

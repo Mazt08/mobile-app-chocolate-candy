@@ -21,6 +21,8 @@ import {
 } from './menu-items';
 import { AuthService } from '../../auth/auth.service';
 import { CartService } from '../../cart/cart.service';
+import { ApiService } from '../../services/api.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
   selector: 'app-side-menu',
@@ -64,7 +66,9 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     private router: Router,
     private menuController: MenuController,
     private auth: AuthService,
-    private cart: CartService
+    private cart: CartService,
+    private api: ApiService,
+    private socket: SocketService
   ) {}
 
   ngOnInit() {
@@ -76,9 +80,33 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     this.auth.user$.pipe(takeUntil(this.destroy$)).subscribe((u) => {
       if (u) {
         this.user = u;
+        // connect socket once authenticated (token stored in auth service)
+        if (u.token) {
+          this.socket.connect(u.token);
+        }
+      } else {
+        this.user = {
+          name: 'Guest User',
+          email: 'guest@chocoexpress.com',
+          avatar: null,
+          points: 0,
+          isLoggedIn: false,
+        };
       }
       this.sections = this.filterSectionsByVisibility(APP_MENU_SECTIONS);
+      this.refreshUnreadBadge();
     });
+
+    // Socket-driven unread refresh triggers
+    this.socket.messageNew$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.refreshUnreadBadge();
+    });
+    this.socket.conversationNew$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.refreshUnreadBadge());
+    this.socket.unreadUpdate$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.refreshUnreadBadge());
 
     // Apply responsive collapse if wide screen (desktop preview scenario)
     this.applyAutoResponsive();
@@ -151,6 +179,43 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     if (cartItem) cartItem.badge = this.cartCount;
   }
 
+  private refreshUnreadBadge() {
+    if (!this.user?.isLoggedIn) {
+      // reset badges
+      const userMsg = this.menuItems.find((i) => i.route === '/messages');
+      if (userMsg) userMsg.badge = undefined;
+      const adminMsg = this.menuItems.find(
+        (i) => i.route === '/admin/messages'
+      );
+      if (adminMsg) adminMsg.badge = undefined;
+      return;
+    }
+    const role = this.user.role;
+    if (role === 'admin') {
+      this.api
+        .getAdminUnreadCount()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (r) => {
+            const adminMsg = this.menuItems.find(
+              (i) => i.route === '/admin/messages'
+            );
+            if (adminMsg) adminMsg.badge = r.unread;
+          },
+        });
+    } else {
+      this.api
+        .getUserUnreadCount()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (r) => {
+            const userMsg = this.menuItems.find((i) => i.route === '/messages');
+            if (userMsg) userMsg.badge = r.unread;
+          },
+        });
+    }
+  }
+
   private loadUserData() {
     // Load from local storage if available
     const savedUser = localStorage.getItem('chocoexpressUser');
@@ -160,6 +225,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
 
     // After loading user state, filter visible sections
     this.sections = this.filterSectionsByVisibility(APP_MENU_SECTIONS);
+    this.refreshUnreadBadge();
   }
 
   getProfileSubtitle(): string {
@@ -228,6 +294,11 @@ export class SideMenuComponent implements OnInit, OnDestroy {
               icon: 'cube-outline',
             },
             {
+              title: 'Messages',
+              route: '/admin/messages',
+              icon: 'chatbubbles-outline',
+            },
+            {
               title: 'Sign Out',
               route: 'logout',
               icon: 'log-out-outline',
@@ -237,22 +308,29 @@ export class SideMenuComponent implements OnInit, OnDestroy {
       ];
       return adminOnly;
     }
-    return sections.map((section) => ({
-      label: section.label,
-      items: section.items.filter((item) => {
-        const vis = item.visibleFor || 'any';
-        if (vis === 'any') return true;
-        if (vis === 'guest') return !isLoggedIn;
-        if (vis === 'user') {
-          if (!isLoggedIn) return false;
-          if (item.visibleForRole && role) {
-            return item.visibleForRole.includes(role as any);
-          }
-          // If no specific role restriction, show to any logged-in user
-          return !item.visibleForRole;
+    // For non-admins/guests: hide empty sections and always drop the 'Admin' section label
+    const filtered = sections
+      .map((section) => {
+        // Skip the Admin section entirely for non-admins
+        if (section.label === 'Admin') {
+          return { label: section.label, items: [] as MenuItem[] };
         }
-        return true;
-      }),
-    }));
+        const items = section.items.filter((item) => {
+          const vis = item.visibleFor || 'any';
+          if (vis === 'any') return true;
+          if (vis === 'guest') return !isLoggedIn;
+          if (vis === 'user') {
+            if (!isLoggedIn) return false;
+            if (item.visibleForRole && role) {
+              return item.visibleForRole.includes(role as any);
+            }
+            return !item.visibleForRole;
+          }
+          return true;
+        });
+        return { label: section.label, items } as MenuSection;
+      })
+      .filter((section) => section.items.length > 0);
+    return filtered;
   }
 }
