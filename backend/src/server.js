@@ -46,6 +46,52 @@ app.get("/api/health", async (_req, res) => {
   });
 });
 
+// Diagnostics: DB stats (admin only)
+app.get(
+  "/api/admin/db-info",
+  authRequired,
+  loadUser,
+  roleRequired("admin"),
+  async (_req, res) => {
+    try {
+      const driver = config.DB_DRIVER;
+      if (driver === "mysql") {
+        const mysqlDriver = require("./mysql");
+        const pool = mysqlDriver.getPool();
+        const [[catRow]] = await pool.query("SELECT COUNT(*) AS c FROM categories");
+        const [[prodRow]] = await pool.query("SELECT COUNT(*) AS c FROM products");
+        const [[userRow]] = await pool.query("SELECT COUNT(*) AS c FROM users");
+        const [[orderRow]] = await pool.query("SELECT COUNT(*) AS c FROM orders");
+        const [[vRow]] = await pool.query("SELECT VERSION() AS version");
+        return res.json({
+          driver,
+            mysql: {
+              version: vRow.version,
+              categories: catRow.c,
+              products: prodRow.c,
+              users: userRow.c,
+              orders: orderRow.c,
+            },
+        });
+      } else {
+        const jsonCore = require("./db");
+        const data = jsonCore.load();
+        return res.json({
+          driver,
+          json: {
+            categories: data.categories?.length || 0,
+            products: data.products?.length || 0,
+            users: data.users?.length || 0,
+            orders: data.orders?.length || 0,
+          },
+        });
+      }
+    } catch (e) {
+      res.status(500).json({ error: String(e?.message || e) });
+    }
+  }
+);
+
 app.get("/api/categories", async (_req, res) => {
   try {
     const data = await Promise.resolve(db.getCategories());

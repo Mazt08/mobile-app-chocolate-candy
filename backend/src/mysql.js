@@ -5,6 +5,9 @@ const bcrypt = require("bcryptjs");
 let pool;
 function getPool() {
   if (!pool) {
+    console.log(
+      `[DB] Connecting MySQL ${config.MYSQL.user}@${config.MYSQL.host}:${config.MYSQL.port}/${config.MYSQL.database}`
+    );
     pool = mysql.createPool({
       host: config.MYSQL.host,
       port: config.MYSQL.port,
@@ -13,6 +16,9 @@ function getPool() {
       database: config.MYSQL.database,
       waitForConnections: true,
       connectionLimit: 10,
+    });
+    pool.on("error", (e) => {
+      console.error("[DB] Pool error:", e?.message || e);
     });
     // Ensure auxiliary table for order metadata exists (idempotent)
     (async () => {
@@ -320,6 +326,8 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
+  // expose pool for diagnostics endpoint
+  getPool,
   async updateOrderStatus(id, status) {
     await getPool().query("UPDATE orders SET status = ? WHERE id = ?", [
       status,
