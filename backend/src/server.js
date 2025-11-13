@@ -58,20 +58,26 @@ app.get(
       if (driver === "mysql") {
         const mysqlDriver = require("./mysql");
         const pool = mysqlDriver.getPool();
-        const [[catRow]] = await pool.query("SELECT COUNT(*) AS c FROM categories");
-        const [[prodRow]] = await pool.query("SELECT COUNT(*) AS c FROM products");
+        const [[catRow]] = await pool.query(
+          "SELECT COUNT(*) AS c FROM categories"
+        );
+        const [[prodRow]] = await pool.query(
+          "SELECT COUNT(*) AS c FROM products"
+        );
         const [[userRow]] = await pool.query("SELECT COUNT(*) AS c FROM users");
-        const [[orderRow]] = await pool.query("SELECT COUNT(*) AS c FROM orders");
+        const [[orderRow]] = await pool.query(
+          "SELECT COUNT(*) AS c FROM orders"
+        );
         const [[vRow]] = await pool.query("SELECT VERSION() AS version");
         return res.json({
           driver,
-            mysql: {
-              version: vRow.version,
-              categories: catRow.c,
-              products: prodRow.c,
-              users: userRow.c,
-              orders: orderRow.c,
-            },
+          mysql: {
+            version: vRow.version,
+            categories: catRow.c,
+            products: prodRow.c,
+            users: userRow.c,
+            orders: orderRow.c,
+          },
         });
       } else {
         const jsonCore = require("./db");
