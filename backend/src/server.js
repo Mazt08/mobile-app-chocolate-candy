@@ -919,3 +919,4 @@ try {
 } catch (e) {
   console.warn("[SPA] Static hosting setup failed:", e?.message || e);
 }
+  
