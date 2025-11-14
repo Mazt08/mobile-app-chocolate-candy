@@ -12,7 +12,6 @@ import {
   IonInput,
   IonIcon,
   IonButton,
-  IonText,
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
@@ -144,7 +143,6 @@ import { environment } from '../../environments/environment';
     IonInput,
     IonIcon,
     IonButton,
-    IonText,
   ],
 })
 export class RegisterPage {
