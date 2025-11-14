@@ -69,7 +69,7 @@ process.on("uncaughtException", (err) => {
 });
 
 // Friendly root message so visiting the backend URL doesn't show a 404
-app.get("/", (_req, res) => {
+app.get("/api", (_req, res) => {
   res
     .status(200)
     .send(
