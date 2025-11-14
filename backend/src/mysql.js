@@ -714,6 +714,22 @@ async function createOrder(payload) {
   }
 }
 
+async function addAdminUser() {
+  const conn = await getPool().getConnection();
+  try {
+    const hashedPassword = await bcrypt.hash("@Admin123", 10);
+    await conn.query(
+      "INSERT INTO users (name, username, email, password, role) VALUES (?, ?, ?, ?, ?)",
+      ["Admin", "admin", "admin@gmail.com", hashedPassword, "admin"]
+    );
+    console.log("Admin user added successfully.");
+  } catch (e) {
+    console.error("Failed to add admin user:", e.message);
+  } finally {
+    conn.release();
+  }
+}
+
 module.exports = {
   getCategories,
   getProducts,
@@ -880,4 +896,5 @@ module.exports = {
     );
     return rows;
   },
+  addAdminUser,
 };
